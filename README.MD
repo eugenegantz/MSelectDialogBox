@@ -40,37 +40,47 @@ var list = ["Apple", "Orange", "Banana"];
 Enable or disable multiple selection of list items.
 Default: false.
 
+
 ####autoComplete (Booleam)####
 Only if target element is text input or textarea. 
 Enable or disable auto compelete.
 Default: false.
 
+
 ####name (String)####
 Name of instance. Uses for search initialized instance by name;
 Default: undefined
+
 
 #Events
 --------------------------------------
 ####onselect####
 Fires when list item is selected
 
+
 ####onchange####
 Fires when text input was changed
+
 
 ####onkeydown####
 Same as original onkeydown event
 
+
 ####onkeyup####
 Same as original onkeyup event
+
 
 ####input:empty####
 Fires when text input become empty
 
+
 ####focus####
+
 
 ####focusout####
 Same as blur
 
+--------------------------------------
 
 Events may be dispatched in two ways.
 Example:
