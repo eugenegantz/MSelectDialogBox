@@ -51,9 +51,15 @@ $(document).ready(function(){
 			}
 			return arr;
 		})(),
-		"multiple": false,
+		// "multiple": false,
 		"autoComplete": true,
-		"name": "a"
+		"input:empty": function(){
+			console.log(arguments);
+		},
+		"onselect": function(){
+			console.log(arguments);
+		}
+		//"name": "a"
 	});
 	
 	$("#msdb-b").mSelectDBox({
