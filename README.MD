@@ -26,49 +26,49 @@
 
 #Argument's options
 --------------------------------------
-#list (Array)
-	Array of list items.
-	Where list items should be:
-	- Object with two strings properties: value, label. 
-		Example:
-		var list = [{"label": "Apple", "value": "0"},  {"label": "Orange", "value": "1"},  {"label": "banana", "value": "2"}];
-	- String
-		Example: 
-		var list = ["Apple", "Orange", "Banana"];
+####list (Array)####
+Array of list items.
+Where list items should be:
+- Object with two strings properties: value, label. 
+Example:
+var list = [{"label": "Apple", "value": "0"},  {"label": "Orange", "value": "1"},  {"label": "banana", "value": "2"}];
+- String
+Example: 
+var list = ["Apple", "Orange", "Banana"];
 	
-#multiple (Boolean).
+####multiple (Boolean)####
 Enable or disable multiple selection of list items.
 Default: false.
 
-#autoComplete (Booleam).
+####autoComplete (Booleam)####
 Only if target element is text input or textarea. 
 Enable or disable auto compelete.
 Default: false.
 
-#name (String).
+####name (String)####
 Name of instance. Uses for search initialized instance by name;
 Default: undefined
 
 #Events
 --------------------------------------
-#onselect.
+####onselect####
 Fires when list item is selected
 
-#onchange;
+####onchange####
 Fires when text input was changed
 
-#onkeydown;
+####onkeydown####
 Same as original onkeydown event
 
-#onkeyup;
+####onkeyup####
 Same as original onkeyup event
 
-#input:empty
+####input:empty####
 Fires when text input become empty
 
-#focus
+####focus####
 
-#focusout
+####focusout####
 Same as blur
 
 
@@ -109,7 +109,7 @@ $("#selector").mSelectDBox({
 
 #Methods
 --------------------------------------
-#getInstances(Object arg)
+####getInstances(Object arg)####
 Search initialized instances by name.
 
 Example:
@@ -117,7 +117,7 @@ Example:
 var dbox = $.prototype.mSelectDBox.prototype.getInstaces({"name":"instanceName"});
 ```
 
-#trigger(String eventName)
+####trigger(String eventName)####
 Fires predefined event.
 
 Example:
@@ -126,7 +126,7 @@ var dbox = $.prototype.mSelectDBox.prototype.getInstaces({"name":"instanceName"}
 dbox.trigger("select");
 ```
 
-#on(String eventName, Function callback)
+####on(String eventName, Function callback)####
 Add custom event listener.
 
 Example:
@@ -140,7 +140,7 @@ dbox.on(
 );
 ```
 
-#select(Object arg)
+####select(Object arg)####
 Select list items by value or label
 arg = {"label": Array|String};
 or 
@@ -154,24 +154,24 @@ dbox.select({"label": "100"});
 dbox.select({"value": "0"});
 ```
 
-#selectAll(void)
+####selectAll(void)####
 Only if multiple = true.
 
-#deselectAll(void)
+####deselectAll(void)####
 
-#open(void)
+####open(void)####
 Show list box.
 
-#close(void)
+####close(void)####
 Hide list box.
 
-#isActive(void);
+####isActive(void)####
 Return true if list box is visible.
 
-#get(String key)
+####get(String key)####
 Returns property of MSelectDBox instance
 
-#set(String key, Any value)
+####set(String key, Any value)####
 Sets new or update property of MSelectDBox instance
 
 #TODO
