@@ -121,6 +121,7 @@ $("#selector").mSelectDBox({
 --------------------------------------
 ####getInstances(Object arg)####
 Search initialized instances by name.
+Return array of matched instances.
 
 Example:
 ```
@@ -132,7 +133,7 @@ Fires predefined event.
 
 Example:
 ```
-var dbox = $.prototype.mSelectDBox.prototype.getInstaces({"name":"instanceName"});
+var dbox = $.prototype.mSelectDBox.prototype.getInstaces({"name":"instanceName"})[0];
 dbox.trigger("select");
 ```
 
@@ -141,7 +142,7 @@ Add custom event listener.
 
 Example:
 ```
-var dbox = $.prototype.mSelectDBox.prototype.getInstaces({"name":"instanceName"});
+var dbox = $.prototype.mSelectDBox.prototype.getInstaces({"name":"instanceName"})[0];
 dbox.on(
 	"select", 
 	function(msdbContext, event){
@@ -158,7 +159,7 @@ arg = {"value": Array|String};
 
 Example:
 ```
-var dbox = $.prototype.mSelectDBox.prototype.getInstaces({"name":"instanceName"});
+var dbox = $.prototype.mSelectDBox.prototype.getInstaces({"name":"instanceName"})[0];
 dbox.select({"label": ["100", "200"]});
 dbox.select({"label": "100"});
 dbox.select({"value": "0"});
@@ -188,3 +189,4 @@ Sets new or update property of MSelectDBox instance
 --------------------------------------
 - Groups
 - Changable appearence
+- README.MD
