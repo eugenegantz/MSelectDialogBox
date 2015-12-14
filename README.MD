@@ -1,4 +1,4 @@
-#MSelectDialogBox - jQuery plugin for interactive dropdown lists.
+#MSelectDBox - jQuery plugin for interactive dropdown lists.
 
 #Features
 --------------------------------------
@@ -30,18 +30,18 @@
 Array of list items.
 Where list items should be:
 - Object with two strings properties: value, label. 
-Example:
+\nExample:
 var list = [{"label": "Apple", "value": "0"},  {"label": "Orange", "value": "1"},  {"label": "banana", "value": "2"}];
 - String
-Example: 
+\nExample:
 var list = ["Apple", "Orange", "Banana"];
 	
 ####multiple (Boolean)####
-Enable or disable multiple selection of list items.
+\nEnable or disable multiple selection of list items.
 Default: false.
 
 
-####autoComplete (Booleam)####
+####autoComplete (Boolean)####
 Only if target element is text input or textarea. 
 Enable or disable auto compelete.
 Default: false.
@@ -82,7 +82,7 @@ Same as blur
 
 --------------------------------------
 
-Events may be dispatched in two ways.
+Events may be attached in two ways.
 Example:
 ```
 $("#selector").mSelectDBox({
