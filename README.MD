@@ -32,25 +32,31 @@ Where list items should be:
 - Object with two strings properties: value, label. 
 
 Example:
+
 `var list = [{"label": "Apple", "value": "0"},  {"label": "Orange", "value": "1"},  {"label": "banana", "value": "2"}];`
 - String
 
 Example:
+
 `var list = ["Apple", "Orange", "Banana"];`
 	
 ####multiple (Boolean)####
-\nEnable or disable multiple selection of list items.
+Enable or disable multiple selection of list items.
+
 Default: false.
 
 
 ####autoComplete (Boolean)####
 Only if target element is text input or textarea. 
+
 Enable or disable auto compelete.
+
 Default: false.
 
 
 ####name (String)####
 Name of instance. Uses for search initialized instance by name;
+
 Default: undefined
 
 
@@ -85,6 +91,7 @@ Same as blur
 --------------------------------------
 
 Events may be attached in two ways.
+
 Example:
 ```
 $("#selector").mSelectDBox({
@@ -154,10 +161,13 @@ dbox.on(
 ```
 
 ####select(Object arg)####
-Select list items by value or label
-arg = {"label": Array|String};
-or 
-arg = {"value": Array|String};
+Select list items by value or label.
+
+`arg = {"label": Array|String};`
+
+or
+
+`arg = {"value": Array|String};`
 
 Example:
 ```
