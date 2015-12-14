@@ -30,11 +30,13 @@
 Array of list items.
 Where list items should be:
 - Object with two strings properties: value, label. 
-\nExample:
-var list = [{"label": "Apple", "value": "0"},  {"label": "Orange", "value": "1"},  {"label": "banana", "value": "2"}];
+
+Example:
+`var list = [{"label": "Apple", "value": "0"},  {"label": "Orange", "value": "1"},  {"label": "banana", "value": "2"}];`
 - String
-\nExample:
-var list = ["Apple", "Orange", "Banana"];
+
+Example:
+`var list = ["Apple", "Orange", "Banana"];`
 	
 ####multiple (Boolean)####
 \nEnable or disable multiple selection of list items.
