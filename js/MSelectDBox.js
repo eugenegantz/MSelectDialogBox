@@ -433,6 +433,9 @@
 				// Отметить выбранные строки
 				self.applySelectedToList();
 
+				// Положение ползунка
+				self._calcScrollBarPosition();
+
 				// Запустить событие
 				// self.trigger("focus", e);
 			},
@@ -567,6 +570,12 @@
 
 				var self = this;
 
+				if (typeof eventName != "string") return;
+
+				eventName = eventName.toLowerCase();
+
+				var eventConstructor = Event || CustomEvent;
+
 				if (
 					typeof this.events[eventName] == "object"
 					&& Array.isArray(this.events[eventName])
@@ -576,7 +585,7 @@
 						e instanceof CustomEvent == false
 						&& e instanceof Event == false
 					){
-						e = new CustomEvent(eventName);
+						e = new eventConstructor(eventName);
 					}
 
 					var events = this.events[eventName];
@@ -835,6 +844,8 @@
 				var dbox = this.get("dbox");
 
 				var tmplist = [];
+
+				// TODO FlattenFn
 
 				for ( c= 0, L = list.length; c<L; c++ ){
 					if ( ["number","string"].indexOf(typeof list[c]) != -1 ){
@@ -1305,14 +1316,10 @@
 			},
 
 
-			"_hideItems": function(){
-
-			},
+			"_hideItems": function(){},
 
 
-			"_unhideItems": function(){
-
-			},
+			"_unhideItems": function(){},
 
 
 			"deselectAll" : function(){
@@ -1422,7 +1429,7 @@
 
 		// ---------------------------------------------------------------------------------------------------
 
-		jQuery.fn.extend({
+		$.fn.extend({
 			"mSelectDBox":  function(arg){
 				if (typeof arg != "object") return;
 				if (this.length){
@@ -1432,6 +1439,6 @@
 			}
 		});
 
-		jQuery.prototype.mSelectDBox.prototype = MSelectDBox.prototype;
+		$.prototype.mSelectDBox.prototype = MSelectDBox.prototype;
 
 	})(jQuery);
