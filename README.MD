@@ -28,7 +28,7 @@ Constructor arguments
 ----------------------------------
 Passing as single object with keys:
 
-[Array] `list` - where list items may be key-value object with two string type properties `{label:String(1),value:String(1)}`
+* [Array] `list` - where list items may be key-value object with two string type properties `{label:String(1),value:String(1)}`
 or string
 
 Example:
@@ -43,15 +43,15 @@ Example:
 
 	`var list = ["Apple", "Orange", "Banana"];`
 	
-[Boolean] `multiple` - enable or disable multiple selection of items in list.
+* [Boolean] `multiple` - enable or disable multiple selection of items in list.
 Default: false.
 
 
-[Boolean] `autoComplete` - enable or disable auto compelete. Only if target element is text input or textarea. 
+* [Boolean] `autoComplete` - enable or disable auto compelete. Only if target element is text input or textarea. 
 Default: false.
 
 
-[String] `name` - name of instance. Used for search initialized instance by name;
+* [String] `name` - name of instance. Used for search initialized instance by name;
 Default: undefined
 
 
