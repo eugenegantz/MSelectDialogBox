@@ -44,17 +44,14 @@ Example:
 	`var list = ["Apple", "Orange", "Banana"];`
 	
 [Boolean] `multiple` - enable or disable multiple selection of items in list.
-
 Default: false.
 
 
 [Boolean] `autoComplete` - enable or disable auto compelete. Only if target element is text input or textarea. 
-
 Default: false.
 
 
 [String] `name` - name of instance. Used for search initialized instance by name;
-
 Default: undefined
 
 
