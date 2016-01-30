@@ -1,15 +1,15 @@
 #MSelectDBox - jQuery plugin for interactive dropdown lists.
 
-#Features
---------------------------------------
+Features
+----------------------------------
 - Multiselect
 - Events
 - Autocomplete
 - Could be attached to any target element
 
-#Example
---------------------------------------
-```
+Example
+----------------------------------
+~~~~~ javascript
 	$("#selector").mSelectDBox({
 		"list": (function(){
 			var arr = [];
@@ -22,78 +22,64 @@
 		"autoComplete": true,
 		"name": "a"
 	});
-```
+~~~~~
 
-#Argument's options
---------------------------------------
-####list (Array)####
-Array of list items.
-Where list items should be:
-- Object with two strings properties: value, label. 
+Constructor arguments
+----------------------------------
+Passing as single object with keys:
+
+[Array] `list` - where list items may be key-value object with two string type properties `{label:String(1),value:String(1)}`
+or string
+
+Example:
+		
+	`var list = [
+		{"label": "Apple", "value": "0"}, 
+		{"label": "Orange", "value": "1"},
+		{"label": "Banana", "value": "2"}
+	];`
 
 Example:
 
-`var list = [{"label": "Apple", "value": "0"},  {"label": "Orange", "value": "1"},  {"label": "banana", "value": "2"}];`
-- String
-
-Example:
-
-`var list = ["Apple", "Orange", "Banana"];`
+	`var list = ["Apple", "Orange", "Banana"];`
 	
-####multiple (Boolean)####
-Enable or disable multiple selection of list items.
+[Boolean] `multiple` - enable or disable multiple selection of items in list.
 
 Default: false.
 
 
-####autoComplete (Boolean)####
-Only if target element is text input or textarea. 
-
-Enable or disable auto compelete.
+[Boolean] `autoComplete` - enable or disable auto compelete. Only if target element is text input or textarea. 
 
 Default: false.
 
 
-####name (String)####
-Name of instance. Uses for search initialized instance by name;
+[String] `name` - name of instance. Used for search initialized instance by name;
 
 Default: undefined
 
 
-#Events
---------------------------------------
-####onselect####
-Fires when list item is selected
+Events
+----------------------------------
+* `onselect` - fires when list item is selected
 
+* `onchange` - fires when text input was changed
 
-####onchange####
-Fires when text input was changed
+* `onkeydown` - same as original onkeydown event
 
+* `onkeyup` - same as original onkeyup event
 
-####onkeydown####
-Same as original onkeydown event
+* `input:empty` - fires when text input become empty
 
+* `focus` - you know... focus
 
-####onkeyup####
-Same as original onkeyup event
-
-
-####input:empty####
-Fires when text input become empty
-
-
-####focus####
-
-
-####focusout####
-Same as blur
+* `focusout` - same as blur
 
 --------------------------------------
 
-Events may be attached in two ways.
+Events may be attached in two ways:
 
 Example:
-```
+~~~~~ javascript
 $("#selector").mSelectDBox({
 	"list": [1,2,3],
 	"onchange": function(msdbContext, event){
@@ -106,10 +92,10 @@ $("#selector").mSelectDBox({
 		console.log(arguments);
 	}
 });
-```
+~~~~~
 
 Example:
-```
+~~~~~ javascript
 $("#selector").mSelectDBox({
 	"list": [1,2,3],
 	"events": {
@@ -124,12 +110,11 @@ $("#selector").mSelectDBox({
 		}
 	}
 });
-```
+~~~~~ 
 
-#Methods
---------------------------------------
-####getInstances(Object arg)####
-Search initialized instances by name.
+Methods
+----------------------------------
+* `getInstances([Object] arg)`: search initialized instances by name.
 Return array of matched instances.
 
 Example:
@@ -137,20 +122,18 @@ Example:
 var dbox = $.prototype.mSelectDBox.prototype.getInstaces({"name":"instanceName"});
 ```
 
-####trigger(String eventName)####
-Fires predefined event.
+* `trigger([String] eventName)`: fire predefined event.
 
 Example:
-```
+~~~~~ javascript
 var dbox = $.prototype.mSelectDBox.prototype.getInstaces({"name":"instanceName"})[0];
 dbox.trigger("select");
-```
+~~~~~
 
-####on(String eventName, Function callback)####
-Add custom event listener.
+* `on([String] eventName, [Function] callback)`: add custom event listener.
 
 Example:
-```
+~~~~~ javascript
 var dbox = $.prototype.mSelectDBox.prototype.getInstaces({"name":"instanceName"})[0];
 dbox.on(
 	"select", 
@@ -158,10 +141,9 @@ dbox.on(
 		console.log(arguments);
 	}
 );
-```
+~~~~~
 
-####select(Object arg)####
-Select list items by value or label.
+* `select([Object] arg)`: select list items by value or label.
 
 `arg = {"label": Array|String};`
 
@@ -170,34 +152,28 @@ or
 `arg = {"value": Array|String};`
 
 Example:
-```
+~~~~~ javascript
 var dbox = $.prototype.mSelectDBox.prototype.getInstaces({"name":"instanceName"})[0];
 dbox.select({"label": ["100", "200"]});
 dbox.select({"label": "100"});
 dbox.select({"value": "0"});
-```
+~~~~~
 
-####selectAll(void)####
-Only if multiple = true.
+* `selectAll(void)`: select all list items. Only if multiple = true.
 
-####deselectAll(void)####
+* `deselectAll(void)`
 
-####open(void)####
-Show list box.
+* `open(void)`: show list box.
 
-####close(void)####
-Hide list box.
+* `close(void)`: hide list box.
 
-####isActive(void)####
-Return true if list box is visible.
+* `isActive(void)`: return true if list box is visible.
 
-####get(String key)####
-Returns property of MSelectDBox instance
+* `([String] key)`: returns property of MSelectDBox instance
 
-####set(String key, Any value)####
-Sets new or update property of MSelectDBox instance
+* `set([String] key, [Any] value)`: set new or update property of MSelectDBox instance
 
-#TODO
+TODO
 --------------------------------------
 - Groups
 - Changable appearence
