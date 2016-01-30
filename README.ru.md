@@ -44,7 +44,7 @@
 
 	`var list = ["Apple", "Orange", "Banana"];`
 
-* [Boolean] `multiple` - вкл. или выкл множественный выбор из списка. (true = включен)
+* [Boolean] `multiple` - вкл. или выкл множественный выбор из списка. (true = включен).
 По-умолчанию: false.
 
 
@@ -52,8 +52,8 @@
 По-умолчанию: false.
 
 
-* [String] `name` - name of instance. Used for search initialized instance by name;
-По-умолчанию: undefined
+* [String] `name` - используется для поиска по имени инициализированного экземпляра списка (см. методы)
+По-умолчанию: undefined.
 
 
 События
