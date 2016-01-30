@@ -40,17 +40,20 @@
 		{"label": "Banana", "value": "2"}
 	];`
 
-Пример: `var list = ["Apple", "Orange", "Banana"];`
+Пример:
 
-* [Boolean] `multiple` - вкл. или выкл множественный выбор из списка. (true = включен)
-По-умолчанию: false
+	`var list = ["Apple", "Orange", "Banana"];`
+
+* [Boolean] `multiple` - вкл. или выкл множественный выбор из списка. (true = включен).
+По-умолчанию: false.
 
 
 * [Boolean] `autoComplete` - вкл или выкл автопоиск по списку. Только если список прикреплен к текстовому <input> или <textarea>.
-По-умолчанию: false
+По-умолчанию: false.
 
-* [String] `name` - name of instance. Used for search initialized instance by name;
-По-умолчанию: undefined
+
+* [String] `name` - используется для поиска по имени инициализированного экземпляра списка (см. методы)
+По-умолчанию: undefined.
 
 
 События
