@@ -5,6 +5,7 @@
 - Множественный выбор
 - События
 - Автопоиск варинтов из списка при наборе
+- Собственные фильтры автопоиска. Например для исправления раскладки с англ. на рус.
 - Можно привязать к любому элементу
 
 Пример
@@ -54,6 +55,39 @@
 
 * [String] `name` - используется для поиска по имени инициализированного экземпляра списка (см. методы)
 По-умолчанию: undefined.
+
+* [Array] `optionFilters` - фильтры для автопоиска. Переключение на русскую раскладку по-умолчанию не включено.
+По-умолчанию: `[$.prototype.mSelectDBox.prototype.defaultOptionFilters.default]`
+
+Фильтры автопоиска
+----------------------------------
+Фильтр - Функция.
+Составляющая автопоиска.
+Сравнивает каждый пункт списка со значением ввода.
+Возвращает `true` если удовлетворяет условию поиска, `false` если нет.
+
+Пример такой функции:
+~~~~~ javascript
+function([String] matcher, [String] matched){
+	if (
+		typeof matcher != "string"
+		|| typeof matched != "string"
+	){
+		return false;
+	}
+
+	var pattern = new RegExp(matcher.toLowerCase().trim());
+	matched = matched.toString().toLowerCase();
+
+	return Boolean(matched.match(pattern));
+}
+~~~~~
+
+Передаются через конструктор при создании экземпляра (парам. "optionFilters"). Или добавляются после инициализации через `instance.get("optionFilters").push(function(matcherStr, matchedStr){...})`
+
+Из коробки доступны фильтры:
+* `$.prototype.mSelectDBox.prototype.defaultOptionFilters.default` - поиск по-умолчанию
+* `$.prototype.mSelectDBox.prototype.defaultOptionFilters.russianKeyboard` - поиск с исправлением раскладки на русскую
 
 
 События
@@ -173,6 +207,7 @@ dbox.select({"value": "0"});
 
 TODO
 --------------------------------------
+- Собственные типы событий. Сейчас типы событий транслируются из целевых элементов
 - Группы
 - Изменяемый внешний вид
 - README.MD

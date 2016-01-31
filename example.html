@@ -3,22 +3,167 @@
 	<head>
 		<meta charset="UTF-8">
 		<title>MultiSelect Dialog Box</title>
+		<style>
+			body {
+				background-color: #e6e6e6;
+				font-family: sans-serif;
+				font-size: 14px;;
+			}
+
+			.form-table td {
+				vertical-align: top;
+				padding-bottom: 12px;
+			}
+
+			.form-table input {
+				width:100%;
+			}
+
+			.std-plate {
+				padding: 12px;
+				background-color:white;
+				box-shadow: 0 2px 7px -2px rgba(0, 0, 0, 0.5);
+			}
+
+			.std-plate_rounded {
+				border-radius: 5px;
+			}
+
+			.std-plate_thick-pad {
+				padding: 32px;
+			}
+
+			.std-input[type="text"],
+			.std-input[type="number"],
+			.std-input[type="date"],
+			select.std-input,
+			textarea.std-input {
+				border:2px solid mediumseagreen;
+				padding:2px;
+				border-radius: 3px;
+			}
+
+			.std-input[type="text"]:focus,
+			.std-input[type="number"]:focus,
+			.std-input[type="date"]:focus,
+			select.std-input:focus,
+			textarea.std-input:focus {
+				box-shadow: 0 0 12px mediumseagreen;
+				outline: none;
+			}
+
+		</style>
 		<script type="application/javascript" src="./js/jquery-2.1.0.min.js"></script>
 		<script type="application/javascript" src="./js/MSelectDBox.js"></script>
-		<script type="application/javascript" src="./js/index.js"></script>
-	</head>
-	<body style="height:1080px; font-family: sans-serif;">
+		<script type="application/javascript">
+			$(document).ready(function(){
 
-	<table>
-		<tr>
-			<td>Multiselect = false, autoComplete = true: </td>
-			<td><label><input id="msdb-a" type="text"></label></td>
-		</tr>
-		<tr>
-			<td>Multiselect = true, autoComplete = true: </td>
-			<td><label><input id="msdb-b" type="text"></label></td>
-		</tr>
-	</table>
+				var eventLog = function(ctx, e){
+					var html = [
+						"name: " + ctx.get("name"),
+						"event.type: " + e.type
+					];
+					$(".events-plate").html(html.join("<br />"));
+				};
+
+				Math.rand = function(min,max){
+					return Math.floor(Math.random() * (max - min + 1)) + min;
+				};
+
+				$("#msdb-a").mSelectDBox({
+					"list": (function(){
+						var arr = [];
+						for(var c=0; c<220; c++){
+							arr.push(Math.round(Math.random() * 1000000));
+						}
+						return arr;
+					})(),
+					"multiple": false,
+					"autoComplete": true,
+					"input:empty": eventLog,
+					"onselect": eventLog,
+					"name": "a"
+				});
+
+				$("#msdb-b").mSelectDBox({
+					"list": (function(){
+						var lib = "qwertyuiopasdfghjklzxcvbnm".split("");
+						var arr = [], str;
+						for(var c=0; c<12; c++){
+							str = "";
+							for(var v=0; v<8; v++){
+								str += lib[Math.rand(0, lib.length-1)];
+							}
+							arr.push(str);
+						}
+						return arr;
+					})(),
+					"builtInInput": 0,
+					"multiple": true,
+					"autoComplete": true,
+					"onkeydown": eventLog,
+					"input:empty": eventLog,
+					"name": "b"
+				});
+
+				$("#msdb-c").mSelectDBox({
+					"list": [
+							"Яблоко",
+							"Апельсин",
+							"Киви",
+							"Авокадо",
+							"Ананас",
+							"Арбуз",
+							"Банан",
+							"и помидор с огурцами"
+					],
+					"builtInInput": 0,
+					"multiple": true,
+					"autoComplete": true,
+					"onkeydown": eventLog,
+					"input:empty": eventLog,
+					"name": "c",
+					"optionFilters": [
+						$.prototype.mSelectDBox.prototype.defaultOptionFilters.default,
+						$.prototype.mSelectDBox.prototype.defaultOptionFilters.russianKeyboard
+					]
+				});
+
+			});
+		</script>
+	</head>
+	<body style="font-family: sans-serif;">
+
+	<div class="std-plate std-plate_thick-pad std-plate_rounded" style="display:inline-block;">
+		<table class="form-table" style="width:420px;">
+			<tr>
+				<td style="width:256px;">Multiselect = false, autoComplete = true: </td>
+				<td>
+					<label>
+						<input id="msdb-a" class="std-input" type="text">
+					</label>
+				</td>
+			</tr>
+			<tr>
+				<td>Multiselect = true, autoComplete = true: </td>
+				<td>
+					<label>
+						<input id="msdb-b" class="std-input" type="text">
+					</label>
+				</td>
+			</tr>
+			<tr>
+				<td>Multiselect = true, autoComplete = true, optionFilters=[default, russianKeyboard]: </td>
+				<td>
+					<label>
+						<input id="msdb-c" class="std-input" type="text">
+					</label>
+				</td>
+			</tr>
+		</table>
+	</div>
+	<br />
+	<div class="std-plate std-plate_thick-pad std-plate_rounded events-plate" style="display:inline-block; width:256px;"></div>
 
 	</body>
 </html>

@@ -155,7 +155,7 @@
 							value	= self.fx.msplit([';',','],value);
 							value = value[value.length-1];
 
-							var pattern = new RegExp(value.trim());
+							// var pattern = new RegExp(value.trim());
 
 							for(v=0; v<li.length; v++){
 								var msdbid = parseInt(li[v].getAttribute("data-msdbid"));
@@ -163,7 +163,9 @@
 								if (  !value  ){
 									li[v].classList.remove('MSelectDBox__list-item_hidden');
 
-								} else if ( !list[msdbid].label.toString().toLowerCase().match(pattern) ){
+								} else if (
+									!self._optionFiltersMatcher(self.get("optionFilters"), value, list[msdbid].label)
+								){
 									li[v].classList.add('MSelectDBox__list-item_hidden');
 
 								} else {
@@ -654,23 +656,27 @@
 				this.styles = Object.create(null);
 
 				this.styles.dboxPaddings = 8;
+				this.styles.listItem_itemColor = null;
+				this.styles.listItem_selectedColor = null;
+				this.styles.listItem_hoverColor = null;
+				this.styles.listItem_selectedHoverColor = null;
 
-				if ( !$('#mSelectDBoxStyle').length ){
+				if (  !$('#mSelectDBoxStyle').length  ){
 					var stylecss = ''
-						+' .MSelectDBox																									{position:absolute; display:block; width:168px; padding:'+this.styles.dboxPaddings+'px; height:auto; box-shadow:0px 0px 8px rgba(0, 0, 0, 0.24); background-color: #FFF; border-radius: 3px;}'
-						+' .MSelectDBox_hidden																						{display:none;}'
-						+' .MSelectDBox:after																							{content:\'\'; position:absolute; border-left:10px solid transparent; border-right:9px solid transparent; border-bottom:10px solid white; top: -10px; left: 50%; margin-left: -10px;}'
-						+' .MSelectDBox_bottom:after																				{content:\'\'; position:absolute; border-left:10px solid transparent; border-right:9px solid transparent; border-bottom: none; border-top:10px solid white; top: initial; bottom: -10px; left: 50%; margin-left: -10px;}'
-						+' .MSelectDBox__list-container																				{position:relative; margin:0px; padding:0px; max-height:200px; overflow-x:hidden;}'
-						+' .MSelectDBox__list-item																					{position:relative; padding:5px; color:black; display:block; line-height:100%; cursor:pointer; font-size:12px;}'
-						+' .MSelectDBox__list-item:hover, .MSelectDBox__list-item_hover 								{background-color:#e6e6e6;}'
-						+' .MSelectDBox__list-item_selected																		{background-color:#C40056; color:white;}'
-						+' .MSelectDBox__list-item_selected:hover, .MSelectDBox__list-item_selected.MSelectDBox__list-item_hover	{background-color:#DB2277;}'
-						+' .MSelectDBox__list-item_selected:before																{content:\':: \';}'
-						+' .MSelectDBox__list-item:active, .MSelectDBox__list-item_selected:active					{background-color:#b80000; color:white;}'
-						+' .MSelectDBox__list-item_hidden																			{display:none;}'
-						+' .MSelectDBox__search-input 																				{border:1px solid #a2a2a2; width:100%;}'
-						+' .MSelectDBox__search-input-container																{margin-bottom:12px;}'
+						+' .MSelectDBox'																								+'{position:absolute; display:block; width:168px; padding:'+this.styles.dboxPaddings+'px; height:auto; box-shadow:0px 0px 8px rgba(0, 0, 0, 0.24); background-color: #FFF; border-radius: 3px;}'
+						+' .MSelectDBox_hidden'																						+'{display:none;}'
+						+' .MSelectDBox:after'																						+'{content:\'\'; position:absolute; border-left:10px solid transparent; border-right:9px solid transparent; border-bottom:10px solid white; top: -10px; left: 50%; margin-left: -10px;}'
+						+' .MSelectDBox_bottom:after'																			+'{content:\'\'; position:absolute; border-left:10px solid transparent; border-right:9px solid transparent; border-bottom: none; border-top:10px solid white; top: initial; bottom: -10px; left: 50%; margin-left: -10px;}'
+						+' .MSelectDBox__list-container'																			+'{position:relative; margin:0px; padding:0px; max-height:200px; overflow-x:hidden;}'
+						+' .MSelectDBox__list-item'																					+'{position:relative; padding:5px; color:black; display:block; line-height:100%; cursor:pointer; font-size:12px;}'
+						+' .MSelectDBox__list-item:hover, .MSelectDBox__list-item_hover'							+'{background-color:#e6e6e6;}'
+						+' .MSelectDBox__list-item_selected'																	+'{background-color:#C40056; color:white;}'
+						+' .MSelectDBox__list-item_selected:hover, .MSelectDBox__list-item_selected.MSelectDBox__list-item_hover{background-color:#DB2277;}'
+						+' .MSelectDBox__list-item_selected:before'															+'{content:\':: \';}'
+						+' .MSelectDBox__list-item:active, .MSelectDBox__list-item_selected:active'				+'{background-color:#b80000; color:white;}'
+						+' .MSelectDBox__list-item_hidden'																		+'{display:none;}'
+						+' .MSelectDBox__search-input'																			+'{border:1px solid #a2a2a2; width:100%;}'
+						+' .MSelectDBox__search-input-container'															+'{margin-bottom:12px;}'
 						+'';
 
 					// #DB2277
@@ -699,7 +705,8 @@
 					{"key":"multiple", "type":"any","into":"boolean"},
 					{"key":"zIndex", "type":"numeric", "into":"integer"},
 					{"key":"width","type":"any"},
-					{"key":"builtInInput", "type":"any", "into": "boolean"}
+					{"key":"builtInInput", "type":"any", "into": "boolean"},
+					{"key":"optionFilters", "type":"array"}
 				];
 
 				for(c=0; c<allowedKeys.length; c++){
@@ -962,7 +969,6 @@
 				this._initList();
 				this._initStyles();
 
-
 				// --------------------------------------------------------------------------------
 				// Таймеры
 
@@ -976,9 +982,15 @@
 				var target = this.get("target");
 
 				// --------------------------------------------------------------------------------
+				// Контейнер списка
+
+				var dbox = this.get("dbox");
+
+				// --------------------------------------------------------------------------------
 
 				if (  self.get("name")  ){
 					target.setAttribute("data-msdb-name",self.get("name"));
+					dbox.setAttribute("data-msdb-name", self.get("name"));
 				}
 
 				self.on(
@@ -1009,6 +1021,16 @@
 						}
 					);
 
+				}
+
+				// --------------------------------------------------------------
+				// Инициализация матчеров строк
+
+				if (  !self.get("optionFilters")  ){
+					self.set(
+						"optionFilters",
+						[self.defaultOptionFilters.default]
+					);
 				}
 
 				// --------------------------------------------------------------
@@ -1312,6 +1334,68 @@
 				if (arg.length) {
 					this.applySelectedToInput();
 					this.applySelectedToList();
+				}
+			},
+
+
+			"_optionFiltersMatcher": function(filters, matcherStr, matchedStr){
+				if (arguments.length < 3) return true;
+				if (typeof filters == "function") filters = [filters];
+				if (!Array.isArray(filters)) return false;
+				for(var c=0; c<filters.length; c++){
+					if (  filters[c].apply(this, [matcherStr, matchedStr])  ){
+						return true;
+					}
+				}
+				return false;
+			},
+
+
+			"defaultOptionFilters": {
+				"default": function(matcherStr, matchedStr){
+					if (
+						typeof matcherStr != "string"
+						|| typeof matchedStr != "string"
+					){
+						return false;
+					}
+
+					var pattern = new RegExp(matcherStr.toLowerCase().trim());
+					matchedStr = matchedStr.toString().toLowerCase();
+
+					return Boolean(matchedStr.match(pattern));
+				},
+
+				"russianKeyboard": function(value, item_label){
+					if (
+						typeof value != "string"
+						|| typeof item_label != "string"
+					){
+						return false;
+					}
+					var enRu = {
+						"`": "ё", "~":"ё", "q":"й",
+						"w":"ц", "e":"у", "r":"к",
+						"t":"е", "y":"н", "u":"г",
+						"i":"ш", "o":"щ", "p":"з",
+						"[":"х", "{":"х", "]":"ъ",
+						"}":"ъ", "a":"ф", "s":"ы",
+						"d":"в", "f":"а", "g":"п",
+						"h":"р", "j":"о", "k":"л",
+						"l":"д", ";":"ж", ":":"э",
+						"'":"э", "\"":"э", "z":"я",
+						"x":"ч", "c":"с", "v":"м",
+						"b":"и", "n":"т", "m":"ь",
+						",":"б", "<":"б", ".":"ю",
+						">":"ю"
+					};
+					var value2 = value.toLowerCase().split("");
+					for(var c= 0, L=value2.length; c<L; c++){
+						if (  enRu.hasOwnProperty(value2[c])  ){
+							value2[c] = enRu[value2[c]];
+						}
+					}
+					return this.defaultOptionFilters.default(value2.join(""), item_label);
 				}
 			},
 

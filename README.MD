@@ -5,6 +5,7 @@ Features
 - Multiselect
 - Events
 - Autocomplete
+- Custom function of autocomplete filter. Example: correction of keyboard language layout
 - Could be attached to any target element
 
 Example
@@ -54,6 +55,9 @@ Default: false.
 * [String] `name` - name of instance. Used for search initialized instance by name;
 Default: undefined
 
+
+* [Array] `optionFilters` - autocomplete filters.
+Default: `[$.prototype.mSelectDBox.prototype.defaultOptionFilters.default]`
 
 Events
 ----------------------------------
@@ -108,6 +112,34 @@ $("#selector").mSelectDBox({
 	}
 });
 ~~~~~ 
+
+Autocomplete filters
+----------------------------------
+Filter it's function. Part of autocomplete module.
+It compares each element of the list with the value of input.
+Returns `true` if it meets the search condition,`false` otherwise.
+
+Example:
+~~~~~ javascript
+function([String] matcher, [String] matched){
+	if (
+		typeof matcher != "string"
+		|| typeof matched != "string"
+	){
+		return false;
+	}
+
+	var pattern = new RegExp(matcher.toLowerCase().trim());
+	matched = matched.toString().toLowerCase();
+
+	return Boolean(matched.match(pattern));
+}
+~~~~~
+
+Passing through constructor (param. "optionFilters"). Or may be added after initialization `instance.get("optionFilters").push(function(matcherStr, matchedStr){...})`
+Filters available by default:
+* `$.prototype.mSelectDBox.prototype.defaultOptionFilters.default` - default autocomplete filter
+* `$.prototype.mSelectDBox.prototype.defaultOptionFilters.russianKeyboard` - correcting layout to russian keyboard
 
 Methods
 ----------------------------------
@@ -172,6 +204,7 @@ dbox.select({"value": "0"});
 
 TODO
 --------------------------------------
+- Custom events type
 - Groups
-- Changable appearence
+- Changeable appearance
 - README.MD
