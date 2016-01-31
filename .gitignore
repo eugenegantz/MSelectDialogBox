@@ -2,4 +2,5 @@
 *.rar
 *.7z
 .idea
+/js/MSelectDBox - Copy.js
 node_modules
