@@ -2,3 +2,4 @@
 *.rar
 *.7z
 .idea
+node_modules
