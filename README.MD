@@ -8,6 +8,8 @@ Features
 - Custom function of autocomplete filter. Example: correction of keyboard language layout
 - Could be attached to any target element
 
+###[Demo](http://eugenegantz.ru/demo/MSelectDBox/example.html/)###
+
 Example
 ----------------------------------
 ~~~~~ javascript
