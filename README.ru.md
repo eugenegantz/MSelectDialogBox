@@ -8,7 +8,7 @@
 - Собственные фильтры автопоиска. Например для исправления раскладки с англ. на рус.
 - Можно привязать к любому элементу
 
-###[Demo](http://eugenegantz.ru/demo/MSelectDBox/example.html/)###
+###[Demo](http://eugenegantz.ru/demo/MSelectDBox/example.html)###
 
 Пример
 ----------------------------------
