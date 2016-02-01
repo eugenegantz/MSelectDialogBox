@@ -31,8 +31,7 @@ Constructor arguments
 ----------------------------------
 Passing as single object with keys:
 
-* [Array] `list` - where list items may be key-value object with two string type properties `{label:String(1),value:String(1)}`
-or string
+* [Array] `list` - where list items may be key-value object with two string type properties `{label:String(1),value:String(1)}` or string
 
 Example:
 		
@@ -45,16 +44,32 @@ Example:
 Example:
 
 	`var list = ["Apple", "Orange", "Banana"];`
+
+if need after initialization you can reassign the list by assigning a new array through a "set" method.
+Example:
+~~~~~ javascript
+var instance = $.prototype.mSelectDBox.prototype.getInstances({"name":"instanceName"})[0];
+instance.set(
+	"list",
+	[
+		"alpha",
+		"beta",
+		"gamma",
+		"delta",
+		"epsilon"
+	]
+);
+~~~~~
 	
 * [Boolean] `multiple` - enable or disable multiple selection of items in list.
 Default: false.
 
 
-* [Boolean] `autoComplete` - enable or disable auto compelete. Only if target element is text input or textarea. 
+* [Boolean] `autoComplete` - enable or disable auto compelete. Only if target element is text input or textarea.
 Default: false.
 
 
-* [String] `name` - name of instance. Used for search initialized instance by name;
+* [String] `name` - name of instance. Used for search initialized instance by name.
 Default: undefined
 
 
@@ -76,6 +91,14 @@ Events
 * `focus` - you know... focus
 
 * `focusout` - same as blur
+
+* `set` - Fires when calling set method. Example: instance.set("fieldName", 100);
+
+* `set:field` - Fires when calling "set" method with specified key. Example: instance.set("field", 100);
+
+* `get` - Fires when calling "get" method. Example: instance.get("fieldName");
+
+* `get:field` -  Fires when calling "get" method with specified key. Example: instance.get("field", 100);
 
 --------------------------------------
 
@@ -150,14 +173,14 @@ Return array of matched instances.
 
 Example:
 ```
-var dbox = $.prototype.mSelectDBox.prototype.getInstaces({"name":"instanceName"});
+var dbox = $.prototype.mSelectDBox.prototype.getInstances({"name":"instanceName"});
 ```
 
 * `trigger([String] eventName)`: fire predefined event.
 
 Example:
 ~~~~~ javascript
-var dbox = $.prototype.mSelectDBox.prototype.getInstaces({"name":"instanceName"})[0];
+var dbox = $.prototype.mSelectDBox.prototype.getInstances({"name":"instanceName"})[0];
 dbox.trigger("select");
 ~~~~~
 
@@ -165,7 +188,7 @@ dbox.trigger("select");
 
 Example:
 ~~~~~ javascript
-var dbox = $.prototype.mSelectDBox.prototype.getInstaces({"name":"instanceName"})[0];
+var dbox = $.prototype.mSelectDBox.prototype.getInstances({"name":"instanceName"})[0];
 dbox.on(
 	"select", 
 	function(msdbContext, event){
@@ -184,7 +207,7 @@ or
 
 Example:
 ~~~~~ javascript
-var dbox = $.prototype.mSelectDBox.prototype.getInstaces({"name":"instanceName"})[0];
+var dbox = $.prototype.mSelectDBox.prototype.getInstances({"name":"instanceName"})[0];
 dbox.select({"label": ["100", "200"]});
 dbox.select({"label": "100"});
 dbox.select({"value": "0"});
@@ -200,7 +223,7 @@ dbox.select({"value": "0"});
 
 * `isActive(void)`: return true if list box is visible.
 
-* `([String] key)`: returns property of MSelectDBox instance
+* `get([String] key)`: returns property of MSelectDBox instance
 
 * `set([String] key, [Any] value)`: set new or update property of MSelectDBox instance
 

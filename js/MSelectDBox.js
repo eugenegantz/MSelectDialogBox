@@ -10,11 +10,28 @@
 		MSelectDBox.prototype = {
 			"instances": [],
 
-			"get" : function(key,arg){
+			"get" : function(key,arg,e){
+
+				var self = this, tmp;
 
 				if (typeof key != "string") return;
 
 				key = key.toLowerCase();
+
+				// .....................
+
+				if (typeof e == "undefined") e = 1;
+
+				var eTrigger = function(name){
+					if (e){
+						var eCons = Event || CustomEvent;
+						self.trigger("get", new eCons(name));
+					}
+				};
+
+				// .....................
+
+				eTrigger("get:"+key);
 
 				var aliases = {};
 
@@ -40,7 +57,9 @@
 			},
 
 
-			"set" : function(key,value,arg){
+			"set" : function(key,value,arg,e){
+
+				var self = this, tmp;
 
 				if (typeof key == "undefined") return false;
 
@@ -58,6 +77,23 @@
 
 				key = key.toLowerCase();
 
+				// .....................
+
+				if (typeof e == "undefined") e = 1;
+
+				var eTrigger = function(name){
+					if (e){
+						var eCons = Event || CustomEvent;
+						var ev = new eCons(name);
+						ev.value = value;
+						self.trigger("set", ev);
+					}
+				};
+
+				// .....................
+
+				eTrigger("set:"+key);
+
 				var aliases = {};
 
 				var methodAliases = {};
@@ -66,23 +102,34 @@
 					key = aliases[key];
 				}
 
+				eTrigger("beforeSet:"+key);
+
 				if ( typeof methodAliases[key] == "string" ) {
 					key = methodAliases[key];
 					if (typeof this[key] != "function"){
 						return false;
 					}
 					if (typeof arg == "undefined") arg = Object.create(null);
-					return this[key](value,arg);
+					tmp = this[key](value,arg);
+					eTrigger("afterSet:"+key);
+					return tmp;
 				}
 
 				this._props[key] = value;
+
+				eTrigger("afterSet:"+key);
 
 				return true;
 
 			},
 
 
-			"getInstaces" : function(arg){
+			"getInstaces" : function(){
+				this.getInstaces().apply(arguments);
+			},
+
+
+			"getInstances": function(arg){
 				if (typeof arg != "object") arg = Object.create(null);
 				var name = (["string","number"].indexOf(typeof arg.name) > -1 ? arg.name : null );
 
@@ -128,13 +175,30 @@
 			},
 
 
+			"_eventDefaultSet": function(){
+				this.trigger(arguments[1].type, arguments[1]);
+			},
+
+
+			"_eventDefaultGet": function(){
+				this.trigger(arguments[1].type, arguments[1]);
+			},
+
+
+			"_eventSetList": function(){
+				var e = arguments[1];
+				this.set("list", e.value, null, false);
+				this.reInitList();
+			},
+
+
 			"_eventDefaultKeyUp": function(e){
 
 				var self						= this;
 				var target					= self.get("target");
 				var keyCode				= e.keyCode;
 				var list						= self.get("list");
-				var dbox					= self.get("dbox");
+				var dbox						= self.get("dbox");
 				var contextElement		= e.currentTarget;
 
 				clearTimeout(self._timers.autoComplete);
@@ -512,12 +576,16 @@
 					}
 				);
 
+				this.on("set",this._eventDefaultSet);
+				this.on("get", this._eventDefaultGet);
+				this.on("afterSet:list", this._eventSetList);
+
 				// ----------------------------------------------------------------
 
 				body.addEventListener(
 					"click",
 					function(){
-
+						// ...
 					}
 				);
 
@@ -842,7 +910,7 @@
 				var c, L;
 
 				if (  !Array.isArray(this.get("list"))  ) {
-					this.set("list", []);
+					this.set("list", [], null, false);
 					return false;
 				}
 
@@ -881,7 +949,7 @@
 				}
 
 				list = tmplist;
-				this.set("list", tmplist);
+				this.set("list", tmplist, null, false);
 
 				// -------------------------------------------------------------------
 
@@ -958,11 +1026,17 @@
 				this.instances.push(this);
 
 				// --------------------------------------------------------------------------------
+				/*
+				* "this._initEvents" внутри использует ссылку на target.
+				* target инициализируется в "this._initProps" и "this._initTarget" и внутри выполняют "this.set"
+				* "this.set" внутри выполняет "this.trigger", для выполнение которого необходим инициализированный this.events
+				* => парадокс того что нужно обьявить первично.
+				* Решается предварительным обьявленимм this.events (Обьявляется дважды: this.initEvents, this.init)
+				* */
+
+				this.events = Object.create(null);
 
 				this._initProps(arg);
-
-				// --------------------------------------------------------------------------------
-
 				this._initTarget();
 				this._initEvents(arg);
 				this._initElements();

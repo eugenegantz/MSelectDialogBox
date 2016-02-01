@@ -30,7 +30,8 @@
 Параметры конструктора
 ----------------------------------
 
-После инициализации, работа с параметрами конструктора доступна через методы get и set (см. методы)
+После инициализации, работа с параметрами конструктора доступна через методы get и set (см. методы).
+
 Аргумент один, передается как объект с ключами:
 
 * [Array] `list` - массив из объектов с двумя ключами типа "строка" `{label:String(1),value:String(1)}` или просто массив строк
@@ -47,6 +48,22 @@
 
 	`var list = ["Apple", "Orange", "Banana"];`
 
+После инициализации, при желании, список можно переназначить присвоив новый массив через "set" метод.
+Пример:
+~~~~~ javascript
+var instance = $.prototype.mSelectDBox.prototype.getInstances({"name":"instanceName"})[0];
+instance.set(
+	"list",
+	[
+		"alpha",
+		"beta",
+		"gamma",
+		"delta",
+		"epsilon"
+	]
+);
+~~~~~
+
 * [Boolean] `multiple` - вкл. или выкл множественный выбор из списка. (true = включен).
 По-умолчанию: false.
 
@@ -55,7 +72,7 @@
 По-умолчанию: false.
 
 
-* [String] `name` - используется для поиска по имени инициализированного экземпляра списка (см. методы)
+* [String] `name` - используется для поиска по имени инициализированного экземпляра списка (см. методы).
 По-умолчанию: undefined.
 
 * [Array] `optionFilters` - фильтры для автопоиска. Переключение на русскую раскладку по-умолчанию не включено.
@@ -98,15 +115,23 @@ function([String] matcher, [String] matched){
 
 * `onchange` - Выполняется когда \<input\> был изменен. Аналог оригинального события onchange
 
-* `onkeydown` - то же что оригинальный onkeydown
+* `onkeydown` - То же что оригинальный onkeydown
 
-* `onkeyup` - то же что оригинальный onkeyup
+* `onkeyup` - То же что оригинальный onkeyup
 
 * `input:empty` - Выполняется когда \<input\> становится пустым
 
 * `focus` - Выполняется когда элемент попадает в фокус
 
 * `focusout` - Выполняется когда элемент теряет фокус
+
+* `set` - Fires при вызове метода set. Кримеру: instance.set("fieldName", 100);
+
+* `set:field` - Выполняется при присваивании значения через метод set по конкретному ключу. К примеру: instance.set("field", 100);
+
+* `get` - Выполняется при вызове метода get. Кримеру: instance.get("fieldName");
+
+* `get:field` - Выполняется при получения значения по конкретному ключу. К примеру: instance.get("field");
 
 --------------------------------------
 
@@ -153,7 +178,7 @@ $("#selector").mSelectDBox({
 
 Пример:
 ```
-var dbox = $.prototype.mSelectDBox.prototype.getInstaces({"name":"instanceName"});
+var dbox = $.prototype.mSelectDBox.prototype.getInstances({"name":"instanceName"});
 ```
 
 
@@ -161,7 +186,7 @@ var dbox = $.prototype.mSelectDBox.prototype.getInstaces({"name":"instanceName"}
 
 Пример:
 ~~~~~ javascript
-var dbox = $.prototype.mSelectDBox.prototype.getInstaces({"name":"instanceName"})[0];
+var dbox = $.prototype.mSelectDBox.prototype.getInstances({"name":"instanceName"})[0];
 dbox.on(
 	"select",
 	function(msdbContext, event){
@@ -175,7 +200,7 @@ dbox.on(
 
 Пример:
 ~~~~~ javascript
-var dbox = $.prototype.mSelectDBox.prototype.getInstaces({"name":"instanceName"})[0];
+var dbox = $.prototype.mSelectDBox.prototype.getInstances({"name":"instanceName"})[0];
 dbox.trigger("select");
 ~~~~~
 
@@ -186,7 +211,7 @@ dbox.trigger("select");
 
 Пример:
 ~~~~~ javascript
-var dbox = $.prototype.mSelectDBox.prototype.getInstaces({"name":"instanceName"})[0];
+var dbox = $.prototype.mSelectDBox.prototype.getInstances({"name":"instanceName"})[0];
 dbox.select({"label": ["100", "200"]});
 dbox.select({"label": "100"});
 dbox.select({"value": "0"});
@@ -203,7 +228,7 @@ dbox.select({"value": "0"});
 
 * `isActive(void)`: возвращает true если список активен (не скрыт).
 
-* `([String] key)`: получить свойство экземпляра MSelectDBox (в том числе параметры конструктора)
+* `get([String] key)`: получить свойство экземпляра MSelectDBox (в том числе параметры конструктора)
 
 * `set([String] key, [Any] value)`: обновить, устанавить новое свойство экземпляра MSelectDBox
 
