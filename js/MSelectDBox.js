@@ -125,7 +125,7 @@
 
 
 			"getInstaces" : function(){
-				this.getInstaces().apply(arguments);
+				return this.getInstances.apply(this, arguments);
 			},
 
 
@@ -141,6 +141,23 @@
 					tmp.push(this.instances[c]);
 				}
 				return tmp;
+			},
+
+
+			"removeInstances": function(arg){
+				if (typeof arg != "object"){
+					return;
+				}
+				var name = typeof arg.name != "string" ? null : arg.name;
+				var tmp = [];
+				for(var c=0; c<this.instances.length; c++){
+					if (  this.instances[c].get("name") == name  ){
+						$(this.instances[c].get("dbox")).detach();
+						continue;
+					}
+					tmp.push(this.instances[c]);
+				}
+				this.instances = tmp;
 			},
 
 
@@ -531,7 +548,7 @@
 				for(eventName in arg.events){
 					if (!arg.events.hasOwnProperty(eventName)) continue;
 					if (typeof arg.events[eventName] != "function") continue;
-					tmpEvents[eventName] = arg[eventName];
+					tmpEvents[eventName] = arg.events[eventName];
 				}
 
 				// Установка событий
