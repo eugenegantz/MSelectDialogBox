@@ -167,7 +167,8 @@
 				{"name": "keyup", "event": "keyup"},
 				{"name": "hover", "event": "hover"},
 				{"name": "focus", "event": "focus"},
-				{"name": "focusout", "event": "blur"}
+				{"name": "focusout", "event": "blur"},
+				{"name": "change", "event": "change"}
 			],
 
 

@@ -3,4 +3,7 @@
 *.7z
 .idea
 /js/MSelectDBox - Copy.js
+/js/showdown.min.js
+README.ru.html
+README.html
 node_modules

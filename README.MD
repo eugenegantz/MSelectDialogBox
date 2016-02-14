@@ -13,18 +13,18 @@ Features
 Example
 ----------------------------------
 ~~~~~ javascript
-	$("#selector").mSelectDBox({
-		"list": (function(){
-			var arr = [];
-			for(var c=0; c<30; c++){
-				arr.push(Math.round(Math.random() * 10000));
-			}
-			return arr;
-		})(),
-		"multiple": false,
-		"autoComplete": true,
-		"name": "a"
-	});
+$("#selector").mSelectDBox({
+	"list": (function(){
+		var arr = [];
+		for(var c=0; c<30; c++){
+			arr.push(Math.round(Math.random() * 10000));
+		}
+		return arr;
+	})(),
+	"multiple": false,
+	"autoComplete": true,
+	"name": "a"
+});
 ~~~~~
 
 Constructor arguments
@@ -34,16 +34,18 @@ Passing as single object with keys:
 * [Array] `list` - where list items may be key-value object with two string type properties `{label:String(1),value:String(1)}` or string
 
 Example:
-		
-	`var list = [
-		{"label": "Apple", "value": "0"}, 
-		{"label": "Orange", "value": "1"},
-		{"label": "Banana", "value": "2"}
-	];`
+```
+var list = [
+	{"label": "Apple", "value": "0"},
+	{"label": "Orange", "value": "1"},
+	{"label": "Banana", "value": "2"}
+];
+```
 
 Example:
-
-	`var list = ["Apple", "Orange", "Banana"];`
+```
+var list = ["Apple", "Orange", "Banana"];
+```
 
 if need after initialization you can reassign the list by assigning a new array through a "set" method.
 Example:
@@ -99,6 +101,10 @@ Events
 * `get` - Fires when calling "get" method. Example: instance.get("fieldName");
 
 * `get:field` -  Fires when calling "get" method with specified key. Example: instance.get("field", 100);
+
+* `afterSet:field` - Fires after "get" method was called with specified key. The event ensures that the function will be executed after the assignment and will have access to new value;
+
+* `beforeSet:field` - Fires before "get" method will be called with specified key.
 
 --------------------------------------
 
