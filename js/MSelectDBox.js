@@ -1599,18 +1599,48 @@
 					}
 
 					return str.join('');
+				},
+
+				"rest": function(arr, n){
+					if (typeof arr != "object") return [];
+					if (typeof n != "number") return [];
+					var k = Object.getOwnPropertyNames(arr);
+					var rest = [];
+					for(; n<k.length; n++){
+						rest.push(arr[k[n]]);
+					}
+					return rest;
 				}
 			}
 		};
 
 		// ---------------------------------------------------------------------------------------------------
 
+		var methodsList = ["open","close","isActive","get","set","selectAll","deselectAll","on","trigger"];
+
 		$.fn.extend({
 			"mSelectDBox":  function(arg){
-				if (typeof arg != "object") return;
-				if (this.length){
+				if (!this.length) return;
+
+				var name = this[0].getAttribute("data-msdb-name");
+				var instances =  MSelectDBox.prototype.getInstances({"name": name});
+
+				if (!arguments.length) {
+					return instances[0];
+
+				} else if (typeof arg == "string"){
+					if (  methodsList.indexOf(arg) > -1  ){
+						var rest = MSelectDBox.prototype.fx.rest(arguments,1);
+						if (  typeof instances[0][arg] == "function"  ){
+							return instances[0][arg].apply(instances[0], rest);
+						}
+					}
+
+				} else if (typeof arg == "object") {
+					// Создать новый экземпляр и привязать его к инпуту
 					arg.target = this[0];
 					return new MSelectDBox(arg);
+
 				}
 			}
 		});
