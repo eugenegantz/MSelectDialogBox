@@ -180,7 +180,8 @@ $("#selector").mSelectDBox({
 
 Методы
 ----------------------------------
-* `getInstances([Object] arg)`: поиск по имени инициализированных экземпляров списка.
+####getInstances####
+`getInstances([Object] arg)` — поиск по имени инициализированных экземпляров списка.
 Возвращает массив подходящих экземпляров списка.
 
 Пример:
@@ -204,7 +205,8 @@ dbox.method(...);
 $("#selector").mSelectDBox("method", ...);
 ```
 
-* `on([String] eventName, [Function] callback)`: устанавливает событие с указанным именем.
+####on####
+`on([String] eventName, [Function] callback)`, `.("on", [String] eventName, [Function] callback)` — устанавливает событие с указанным именем.
 
 Пример:
 ~~~~~ javascript
@@ -224,11 +226,12 @@ $("#selector").mSelectDBox(
 	"select",
 	function(msdbContext, event){
 		console.log(arguments);
-    });
+    }
+);
 ~~~~~
 
-
-* `trigger([String] eventName)`: запускает указанное событие. (Если оно разумеется заранее установлено)
+####trigger####
+`trigger([String] eventName)`, `.("trigger", [String] eventName)` — запускает указанное событие. (Если оно разумеется заранее установлено)
 
 Пример:
 ~~~~~ javascript
@@ -238,10 +241,11 @@ dbox.trigger("select");
 
 Альтернатива:
 ~~~~~ javascript
-$("#selector").mSelectDBox("trigger");
+$("#selector").mSelectDBox("trigger","select");
 ~~~~~
 
-* `select([Object] arg)`: выделяет из списка элемент по указанному имени или значению.
+####select####
+`select([Object] arg)`, `.("select", [Object] arg)` — выделяет из списка элемент по указанному имени или значению.
 
 `arg = {"label": Array|String};` или `arg = {"value": Array|String};`
 
@@ -258,19 +262,26 @@ dbox.select({"value": "0"});
 $("#selector").mSelectDBox("select",{"label": ["100", "200"]});
 ~~~~~
 
-* `selectAll(void)`: выбрать все элементы из списка. Только если multiple = true.
+####selectAll####
+`selectAll(void)` — выбрать все элементы из списка. Только если multiple = true.
 
-* `deselectAll(void)`
+####deselectAll####
+`deselectAll(void)`
 
-* `open(void)`: показать список.
+####open####
+`open(void)` — показать список.
 
-* `close(void)`: скрыть список.
+####close####
+`close(void)` — скрыть список.
 
-* `isActive(void)`: возвращает true если список активен (не скрыт).
+####isActive####
+`isActive(void)` — возвращает true если список активен (не скрыт).
 
-* `get([String] key)`: получить свойство экземпляра MSelectDBox (в том числе параметры конструктора)
+####get####
+`get([String] key)` — получить свойство экземпляра MSelectDBox (в том числе параметры конструктора)
 
-* `set([String] key, [Any] value)`: обновить, устанавить новое свойство экземпляра MSelectDBox
+####set####
+`set([String] key, [Any] value)` — обновить, устанавить новое свойство экземпляра MSelectDBox
 
 TODO
 --------------------------------------

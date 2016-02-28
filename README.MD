@@ -174,7 +174,8 @@ Filters available by default:
 
 Methods
 ----------------------------------
-* `getInstances([Object] arg)`: search initialized instances by name.
+####getInstances####
+`getInstances([Object] arg)` — search initialized instances by name.
 Return array of matched instances.
 
 Example:
@@ -194,7 +195,8 @@ var dbox = $.prototype.mSelectDBox.prototype.getInstances({"name":"instanceName"
 dbox.method(...);
 ```
 
-* `trigger([String] eventName)`: fire predefined event.
+####trigger####
+`trigger([String] eventName)`, `.("trigger", [String] eventName)` — fire predefined event.
 
 Example:
 ~~~~~ javascript
@@ -204,10 +206,11 @@ dbox.trigger("select");
 
 Alternative:
 ~~~~~ javascript
-$("#selector").mSelectDBox("trigger");
+$("#selector").mSelectDBox("trigger","select");
 ~~~~~
 
-* `on([String] eventName, [Function] callback)`: add custom event listener.
+####on####
+`on([String] eventName, [Function] callback)`, `.("on", [String] eventName, [Function] callback)` — add custom event listener.
 
 Example:
 ~~~~~ javascript
@@ -227,16 +230,18 @@ $("#selector").mSelectDBox(
 	"select",
 	function(msdbContext, event){
 		console.log(arguments);
-    });
+    }
+);
 ~~~~~
 
-* `select([Object] arg)`: select list items by value or label.
+####select####
+`select([Object] arg)`,`.("select", [Object] arg)` — select list items by value or label.
 
-`arg = {"label": Array|String};`
+`arg = {"label": Array | String};`
 
 or
 
-`arg = {"value": Array|String};`
+`arg = {"value": Array | String};`
 
 Example:
 ~~~~~ javascript
@@ -251,19 +256,26 @@ Alternative:
 $("#selector").mSelectDBox("select",{"label": ["100", "200"]});
 ~~~~~
 
-* `selectAll(void)`: select all list items. Only if multiple = true.
+####selectAll####
+`selectAll(void)` — select all list items. Only if multiple = true.
 
-* `deselectAll(void)`
+####deselectAll####
+`deselectAll(void)`
 
-* `open(void)`: show list box.
+####open####
+`open(void)` — show list box.
 
-* `close(void)`: hide list box.
+####close####
+`close(void)` — hide list box.
 
-* `isActive(void)`: return true if list box is visible.
+####isActive####
+`isActive(void)` — return true if list box is visible.
 
-* `get([String] key)`: returns property of MSelectDBox instance
+####get####
+`get([String] key)` — returns property of MSelectDBox instance
 
-* `set([String] key, [Any] value)`: set new or update property of MSelectDBox instance
+####set####
+`set([String] key, [Any] value)` — set new or update property of MSelectDBox instance
 
 TODO
 --------------------------------------
