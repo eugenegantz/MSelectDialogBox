@@ -53,16 +53,16 @@ var list = ["Apple", "Orange", "Banana"];
 После инициализации, при желании, список можно переназначить присвоив новый массив через "set" метод.
 Пример:
 ~~~~~ javascript
-var instance = $.prototype.mSelectDBox.prototype.getInstances({"name":"instanceName"})[0];
-instance.set(
+$("#selector").mSelectDBox(
+	"set",
 	"list",
 	[
-		"alpha",
-		"beta",
-		"gamma",
-		"delta",
-		"epsilon"
-	]
+    	"alpha",
+    	"beta",
+    	"gamma",
+    	"delta",
+    	"epsilon"
+    ]
 );
 ~~~~~
 
@@ -188,6 +188,21 @@ $("#selector").mSelectDBox({
 var dbox = $.prototype.mSelectDBox.prototype.getInstances({"name":"instanceName"});
 ```
 
+Альтернатива:
+```
+var dbox = $("#selector").mSelectDBox();
+```
+----------------------------------
+Следующие методы можно вызывать как методы экземпляра так и в качестве параметра для метода mSelectDBox.
+```
+var dbox = $.prototype.mSelectDBox.prototype.getInstances({"name":"instanceName"})[0];
+dbox.method(...);
+```
+
+Альтернатива:
+```
+$("#selector").mSelectDBox("method", ...);
+```
 
 * `on([String] eventName, [Function] callback)`: устанавливает событие с указанным именем.
 
@@ -202,6 +217,16 @@ dbox.on(
 );
 ~~~~~
 
+Альтернатива:
+~~~~~ javascript
+$("#selector").mSelectDBox(
+	"on",
+	"select",
+	function(msdbContext, event){
+		console.log(arguments);
+    });
+~~~~~
+
 
 * `trigger([String] eventName)`: запускает указанное событие. (Если оно разумеется заранее установлено)
 
@@ -211,6 +236,10 @@ var dbox = $.prototype.mSelectDBox.prototype.getInstances({"name":"instanceName"
 dbox.trigger("select");
 ~~~~~
 
+Альтернатива:
+~~~~~ javascript
+$("#selector").mSelectDBox("trigger");
+~~~~~
 
 * `select([Object] arg)`: выделяет из списка элемент по указанному имени или значению.
 
@@ -224,6 +253,10 @@ dbox.select({"label": "100"});
 dbox.select({"value": "0"});
 ~~~~~
 
+Альтернатива:
+~~~~~ javascript
+$("#selector").mSelectDBox("select",{"label": ["100", "200"]});
+~~~~~
 
 * `selectAll(void)`: выбрать все элементы из списка. Только если multiple = true.
 

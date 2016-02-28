@@ -50,16 +50,16 @@ var list = ["Apple", "Orange", "Banana"];
 if need after initialization you can reassign the list by assigning a new array through a "set" method.
 Example:
 ~~~~~ javascript
-var instance = $.prototype.mSelectDBox.prototype.getInstances({"name":"instanceName"})[0];
-instance.set(
+$("#selector").mSelectDBox(
+	"set",
 	"list",
 	[
-		"alpha",
-		"beta",
-		"gamma",
-		"delta",
-		"epsilon"
-	]
+    	"alpha",
+    	"beta",
+    	"gamma",
+    	"delta",
+    	"epsilon"
+    ]
 );
 ~~~~~
 	
@@ -182,12 +182,29 @@ Example:
 var dbox = $.prototype.mSelectDBox.prototype.getInstances({"name":"instanceName"});
 ```
 
+Alternative:
+```
+var dbox = $("#selector").mSelectDBox();
+```
+
+----------------------------------
+The following methods can be called as an instance method or as a parameter to the method "mSelectDBox".
+```
+var dbox = $.prototype.mSelectDBox.prototype.getInstances({"name":"instanceName"})[0];
+dbox.method(...);
+```
+
 * `trigger([String] eventName)`: fire predefined event.
 
 Example:
 ~~~~~ javascript
 var dbox = $.prototype.mSelectDBox.prototype.getInstances({"name":"instanceName"})[0];
 dbox.trigger("select");
+~~~~~
+
+Alternative:
+~~~~~ javascript
+$("#selector").mSelectDBox("trigger");
 ~~~~~
 
 * `on([String] eventName, [Function] callback)`: add custom event listener.
@@ -201,6 +218,16 @@ dbox.on(
 		console.log(arguments);
 	}
 );
+~~~~~
+
+Alternative:
+~~~~~ javascript
+$("#selector").mSelectDBox(
+	"on",
+	"select",
+	function(msdbContext, event){
+		console.log(arguments);
+    });
 ~~~~~
 
 * `select([Object] arg)`: select list items by value or label.
@@ -217,6 +244,11 @@ var dbox = $.prototype.mSelectDBox.prototype.getInstances({"name":"instanceName"
 dbox.select({"label": ["100", "200"]});
 dbox.select({"label": "100"});
 dbox.select({"value": "0"});
+~~~~~
+
+Alternative:
+~~~~~ javascript
+$("#selector").mSelectDBox("select",{"label": ["100", "200"]});
 ~~~~~
 
 * `selectAll(void)`: select all list items. Only if multiple = true.

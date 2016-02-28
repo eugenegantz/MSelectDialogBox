@@ -1604,19 +1604,14 @@
 				"rest": function(arr, n){
 					if (typeof arr != "object") return [];
 					if (typeof n != "number") return [];
-					var k = Object.getOwnPropertyNames(arr);
-					var rest = [];
-					for(; n<k.length; n++){
-						rest.push(arr[k[n]]);
-					}
-					return rest;
+					return Array.prototype.slice.call(arr, n);
 				}
 			}
 		};
 
 		// ---------------------------------------------------------------------------------------------------
 
-		var methodsList = ["open","close","isActive","get","set","selectAll","deselectAll","on","trigger"];
+		var methodsList = ["open","close","isActive","get","set","select","selectAll","deselectAll","on","trigger"];
 
 		$.fn.extend({
 			"mSelectDBox":  function(arg){
