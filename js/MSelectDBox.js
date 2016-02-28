@@ -130,7 +130,10 @@
 
 
 			"getInstances": function(arg){
+				if (!arguments.length) return this.instances;
+
 				if (typeof arg != "object") arg = Object.create(null);
+
 				var name = (["string","number"].indexOf(typeof arg.name) > -1 ? arg.name : null );
 
 				var tmp = [];
@@ -450,8 +453,6 @@
 				var dbox	= self.get("dbox");
 
 				self.open();
-
-				self.calcPosition();
 
 				var contextElement = (  e.currentTarget || (this instanceof Element ? this : null )  );
 
@@ -1189,11 +1190,14 @@
 
 			"_isDBoxElement": function(element){
 				var dbox = this.get("dbox");
-				var each = $("*", dbox).toArray();
-				each.push(dbox);
-
-				for (var c=0; c<each.length; c++){
-					if ( each[c] == element ) return true;
+				// var each = $("*", dbox).toArray();
+				var each = dbox.querySelectorAll("*");
+				if (each){
+					each = Array.prototype.slice.call(each,0);
+					each.push(dbox);
+					for (var c=0; c<each.length; c++){
+						if ( each[c] == element ) return true;
+					}
 				}
 
 				return false;
@@ -1202,13 +1206,17 @@
 
 			"_isTargetElement": function(element){
 				var target = this.get("target");
-				var each = $("*",target).toArray();
-				each.push(target);
-
-				for(var c=0; c<each.length; c++){
-					if (each[c] == element){
-						return true;
+				// var each = $("*",target).toArray();
+				var each = target.querySelectorAll("*");
+				if (each){
+					each = Array.prototype.slice.call(each,0);
+					each.push(target);
+					for(var c=0; c<each.length; c++){
+						if (each[c] == element){
+							return true;
+						}
 					}
+
 				}
 
 				return false;
@@ -1553,6 +1561,7 @@
 			"open" : function(){
 				var dbox = this.get("dbox");
 				dbox.classList.remove("MSelectDBox_hidden");
+				this.calcPosition();
 			},
 
 
@@ -1617,17 +1626,26 @@
 			"mSelectDBox":  function(arg){
 				if (!this.length) return;
 
-				var name = this[0].getAttribute("data-msdb-name");
-				var instances =  MSelectDBox.prototype.getInstances({"name": name});
+				// var name = this[0].getAttribute("data-msdb-name");
+				var instances =  MSelectDBox.prototype.getInstances();
+				var instance = void 0;
+				var input = this[0];
+
+				for(var c=0; c<instances.length; c++){
+					if (  instances[c].get("target") == input  ){
+						instance = instances[c];
+						break;
+					}
+				}
 
 				if (!arguments.length) {
-					return instances[0];
+					return instance;
 
 				} else if (typeof arg == "string"){
 					if (  methodsList.indexOf(arg) > -1  ){
 						var rest = MSelectDBox.prototype.fx.rest(arguments,1);
-						if (  typeof instances[0][arg] == "function"  ){
-							return instances[0][arg].apply(instances[0], rest);
+						if (  typeof instance[arg] == "function"  ){
+							return instance[arg].apply(instance, rest);
 						}
 					}
 
