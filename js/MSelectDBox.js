@@ -10,6 +10,7 @@
 		MSelectDBox.prototype = {
 			"instances": [],
 
+
 			"get" : function(key,arg,e){
 
 				var self = this, tmp;
@@ -24,8 +25,7 @@
 
 				var eTrigger = function(name){
 					if (e){
-						var eCons = Event || CustomEvent;
-						self.trigger("get", new eCons(name));
+						self.trigger("get", new $.Event(name));
 					}
 				};
 
@@ -83,8 +83,7 @@
 
 				var eTrigger = function(name){
 					if (e){
-						var eCons = Event || CustomEvent;
-						var ev = new eCons(name);
+						var ev = new $.Event(name);
 						ev.value = value;
 						self.trigger("set", ev);
 					}
@@ -134,7 +133,7 @@
 
 				if (typeof arg != "object") arg = Object.create(null);
 
-				var name = (["string","number"].indexOf(typeof arg.name) > -1 ? arg.name : null );
+				var name = (  $.inArray(typeof arg.name, ["string","number"]) > -1 ? arg.name : null );
 
 				var tmp = [];
 				for(var c=0; c<this.instances.length; c++){
@@ -170,7 +169,7 @@
 				{"name": "keyup", "event": "keyup"},
 				{"name": "hover", "event": "hover"},
 				{"name": "focus", "event": "focus"},
-				{"name": "focusout", "event": "blur"},
+				{"name": "focusout", "event": "focusout"},
 				{"name": "change", "event": "change"}
 			],
 
@@ -181,8 +180,8 @@
 
 				if (
 					(
-					["input","textarea"].indexOf(target.tagName.toLowerCase()) != -1
-					|| ["text", "password", "email", "url", "search", "tel"].indexOf(target.type.toLowerCase()) != -1
+						$.inArray(target.tagName.toLowerCase(), ["input","textarea"]) != -1
+					|| $.inArray(target.type.toLowerCase(), ["text", "password", "email", "url", "search", "tel"]) != -1
 					)
 					&& !target.value.trim()
 				) {
@@ -230,7 +229,7 @@
 					// ... autoComplete
 					if (  self.get("autoComplete")  ){
 
-						if ( [37,38,39,40,9,13,18,17,16,20,27].indexOf(keyCode) > -1 ){
+						if (  $.inArray(keyCode, [37,38,39,40,9,13,18,17,16,20,27]) > -1 ){
 
 						} else {
 
@@ -244,21 +243,22 @@
 
 							for(v=0; v<li.length; v++){
 								var msdbid = parseInt(li[v].getAttribute("data-msdbid"));
+								var jqLi = $(li[v]);
 
 								if (  !value  ){
-									li[v].classList.remove('MSelectDBox__list-item_hidden');
+									jqLi.removeClass('MSelectDBox__list-item_hidden');
 
 								} else if (
 									!self._optionFiltersMatcher(self.get("optionFilters"), value, list[msdbid].label)
 								){
-									li[v].classList.add('MSelectDBox__list-item_hidden');
+									jqLi.addClass('MSelectDBox__list-item_hidden');
 
 								} else {
-									li[v].classList.remove('MSelectDBox__list-item_hidden');
+									jqLi.removeClass('MSelectDBox__list-item_hidden');
 
 								}
 
-								li[v].classList.remove('MSelectDBox__list-item_hover');
+								jqLi.removeClass('MSelectDBox__list-item_hover');
 							}
 						}
 
@@ -278,7 +278,7 @@
 
 							for(var prop in list){
 								if (!list.hasOwnProperty(prop)) continue;
-								list[prop].selected = (value.indexOf(list[prop].label.trim()) > -1);
+								list[prop].selected = ($.inArray(list[prop].label.trim(), value)> -1);
 							}
 
 							self.applySelectedToList();
@@ -305,7 +305,7 @@
 				// Если список без множественного выделения
 				if (  self.get("multiple")  ) return; // close.if.!multiple
 
-				if (  [37,39,9,18,17,16,20,27].indexOf(e.keyCode) > -1  ){
+				if (  $.inArray(e.keyCode, [37,39,9,18,17,16,20,27]) > -1  ){
 					// left, right, tab, alt, ctrl, shift, caps, esc
 
 				} else if ( e.keyCode == 13 ){
@@ -320,7 +320,7 @@
 
 					}
 
-				} else if ( [38,39,40].indexOf(e.keyCode) > -1 ) {
+				} else if (  $.inArray(e.keyCode, [38,39,40]) > -1 ) {
 
 					// other keys
 
@@ -331,9 +331,11 @@
 					li = $('li:not(.MSelectDBox__list-item_hidden)', dbox);
 
 					var selectedLi = -1;
+					var jqli;
 
 					for(c=0, L=li.length; c<L; c++){
-						if (  li[c].classList.contains("MSelectDBox__list-item_selected")  ){
+						jqli = $(li[c]);
+						if (  jqli.hasClass("MSelectDBox__list-item_selected")  ){
 							selectedLi = c;
 							break;
 						}
@@ -376,7 +378,7 @@
 				var selectedKey;
 
 				if (  self.get("multiple")  ){
-					if ( [37,39,9,18,17,16,20,27].indexOf(e.keyCode) > -1 ){
+					if (  $.inArray(e.keyCode, [37,39,9,18,17,16,20,27]) > -1  ){
 						// left, right, tab, alt, ctrl, shift, caps, esc
 
 					} else if (  e.keyCode == 13  ){
@@ -391,7 +393,7 @@
 
 						selectedKey = parseInt(hoveredLi.getAttribute('data-msdbid'));
 
-						var tmp = selectedKeys.indexOf(selectedKey);
+						var tmp = $.inArray(selectedKey, selectedKeys);
 
 						if (  tmp > -1  ){
 							selectedKeys[tmp] = null;
@@ -406,7 +408,7 @@
 						return;
 					}
 
-					if ( [38,40].indexOf(e.keyCode) > -1 ) {
+					if (  $.inArray(e.keyCode, [38,40]) > -1  ) {
 						// up, down
 
 						// var ul = $(".MSelectDBox__list-container", dbox);
@@ -414,9 +416,11 @@
 						var li = $('.MSelectDBox__list-item:not(.MSelectDBox__list-item_hidden)', dbox);
 
 						hoveredLi = -1;
+						var jqli;
 
 						for(c=0, L=li.length; c<L; c++){
-							if (  li[c].classList.contains("MSelectDBox__list-item_hover")  ) {
+							jqli = $(li[c]);
+							if (  jqli.hasClass("MSelectDBox__list-item_hover")  ) {
 								hoveredLi = c;
 							}
 						}
@@ -433,10 +437,10 @@
 							return;
 						}
 
-						li[newHoveredLi].classList.add("MSelectDBox__list-item_hover");
+						$(li[newHoveredLi]).addClass("MSelectDBox__list-item_hover");
 
 						if (hoveredLi > -1 && newHoveredLi != hoveredLi){
-							li[hoveredLi].classList.remove("MSelectDBox__list-item_hover");
+							$(li[hoveredLi]).removeClass("MSelectDBox__list-item_hover");
 						}
 
 						self._calcScrollBarPosition();
@@ -457,10 +461,10 @@
 				var contextElement = (  e.currentTarget || (this instanceof Element ? this : null )  );
 
 				if (
-					["input","textarea"].indexOf(contextElement.tagName.toLowerCase()) != -1
+					$.inArray(contextElement.tagName.toLowerCase(), ["input","textarea"]) != -1
 					|| (
 					contextElement.type
-					&& ["text", "password", "email", "url", "search", "tel"].indexOf(contextElement.type.toLowerCase()) != -1
+					&& $.inArray(contextElement.type.toLowerCase(), ["text", "password", "email", "url", "search", "tel"]) != -1
 					)
 				){
 					msdb_value = contextElement.getAttribute('data-msdb-value');
@@ -496,20 +500,25 @@
 
 				if (dbox_li.length){
 					// Снять hover со строки
+					dbox_li.removeClass('MSelectDBox__list-item_hidden');
 					for (v=0; v<dbox_li.length; v++){
 						if (
 							(
-							typeof contextElement.type != "undefined"
-							&& ["submit","button"].indexOf(contextElement.type.toLowerCase()) > -1
+								typeof contextElement.type != "undefined"
+								&& $.inArray(contextElement.type.toLowerCase(), ["submit","button"]) > -1
 							)
-							|| ( ["submit","body","select"].indexOf(contextElement.tagName.toLowerCase()) > -1 )
+							|| (  $.inArray(contextElement.tagName.toLowerCase(), ["submit","body","select"]) > -1 )
 						){
 
 						} else {
-							dbox_li[v].classList.remove('MSelectDBox__list-item_hover');
+							$(dbox_li[v]).removeClass('MSelectDBox__list-item_hover');
 						}
-						dbox_li[v].classList.remove('MSelectDBox__list-item_hidden');
 					}
+				}
+
+				// Записать value внутри инпута
+				if (  !self.get("freeWrite")  ){
+					self.applySelectedToInput();
 				}
 
 				// Записать value внутри инпута
@@ -573,6 +582,13 @@
 				);
 
 				this.on(
+					"change",
+					function(context, e){
+						self._eventCheckInputEmpty(e);
+					}
+				);
+
+				this.on(
 					"input:empty",
 					self._eventDefaultInputEmpty
 				);
@@ -601,24 +617,28 @@
 
 				// ----------------------------------------------------------------
 
+				/*
 				body.addEventListener(
 					"click",
 					function(){
 						// ...
 					}
 				);
+				*/
 
 			},
 
 
 			"_deactivateInstances": function(e){
-				if (
-					this._isDBoxElement(e.target)
-					|| this._isTargetElement(e.target)
-				){
-					return;
+				for(var c=0; c<this.instances.length; c++){
+					if (
+						this.instances[c]._isDBoxElement(e.target)
+						|| this.instances[c]._isTargetElement(e.target)
+					){
+						continue;
+					}
+					if (  this.instances[c].isActive()  ) this.instances[c].close();
 				}
-				if (  this.isActive()  ) this.close();
 			},
 
 
@@ -663,8 +683,6 @@
 
 				eventName = eventName.toLowerCase();
 
-				var eventConstructor = Event || CustomEvent;
-
 				if (
 					typeof this.events[eventName] == "object"
 					&& Array.isArray(this.events[eventName])
@@ -673,8 +691,9 @@
 					if (
 						e instanceof CustomEvent == false
 						&& e instanceof Event == false
+						&& e instanceof $.Event == false
 					){
-						e = new eventConstructor(eventName);
+						e = new $.Event(eventName);
 					}
 
 					var events = this.events[eventName];
@@ -715,7 +734,8 @@
 					for(c=0; c<this._targetEvents.length; c++){
 
 						if (  this._targetEvents[c].name.toLowerCase() == eventName  ){
-							target.addEventListener(
+							// addEventListener || attachEvent
+							$(target).bind(
 								this._targetEvents[c].event,
 								function(e){
 									self.trigger(eventName, e);
@@ -793,7 +813,8 @@
 					{"key":"zIndex", "type":"numeric", "into":"integer"},
 					{"key":"width","type":"any"},
 					{"key":"builtInInput", "type":"any", "into": "boolean"},
-					{"key":"optionFilters", "type":"array"}
+					{"key":"optionFilters", "type":"array"},
+					{"key":"freeWrite", "type":"any", "into": "boolean"}
 				];
 
 				for(c=0; c<allowedKeys.length; c++){
@@ -858,7 +879,7 @@
 								typeof arg.width == "undefined"
 									?  "min"
 									: (
-									["min","auto"].indexOf(arg.width) > -1
+									$.inArray(arg.width, ["min","auto"]) > -1
 										? arg.width
 										: parseInt(arg.width)
 								)
@@ -881,10 +902,12 @@
 				var body = $("body").get(0);
 
 				var dbox = document.createElement('div');
+				var jqDBox = $(dbox);
 
 				this.set("dbox", dbox);
 
-				dbox.className = "MSelectDBox MSelectDBox_hidden";
+				jqDBox.addClass("MSelectDBox");
+				jqDBox.addClass("MSelectDBox_hidden");
 
 				var searchInputContainer = $(
 					'<div class="MSelectDBox__search-input-container">' +
@@ -928,7 +951,7 @@
 
 				var c, L;
 
-				if (  !Array.isArray(this.get("list"))  ) {
+				if (  !$.isArray(this.get("list"))  ) {
 					this.set("list", [], null, false);
 					return false;
 				}
@@ -942,7 +965,7 @@
 				// TODO FlattenFn
 
 				for ( c= 0, L = list.length; c<L; c++ ){
-					if ( ["number","string"].indexOf(typeof list[c]) != -1 ){
+					if (  $.inArray(typeof list[c], ["number","string"]) != -1  ){
 
 						tmplist.push({
 							"value": list[c].toString(),
@@ -987,8 +1010,9 @@
 
 					li.setAttribute('data-msdbid',itemKey);
 
-					li.addEventListener(
-						'click',
+					// addEventListener || attachEvent
+					$(li).bind(
+						"click",
 						function(e){
 							var selectedKeys = [];
 
@@ -1019,9 +1043,11 @@
 						null
 					);
 
-					li.addEventListener('mouseleave',function(){
-						if (this.classList.contains("MSelectDBox__list-item_hover")){
-							this.classList.remove("MSelectDBox__list-item_hover");
+					// addEventListener || attachEvent
+					$(li).bind("mouseleave",function(){
+						var jqThis = $(this);
+						if (  jqThis.hasClass("MSelectDBox__list-item_hover")  ){
+							jqThis.removeClass("MSelectDBox__list-item_hover");
 						}
 					},null);
 
@@ -1040,7 +1066,7 @@
 
 				var self = this;
 
-				var body = document.querySelector('body');
+				var body = $('body').get(0);
 
 				this.instances.push(this);
 
@@ -1065,9 +1091,14 @@
 				// --------------------------------------------------------------------------------
 				// Таймеры
 
-				this._timers = {
-					"autoComplete" : null
-				};
+				this._timers = Object.create(null);
+				this._timers.autoComplete = null;
+				this._timers.focusedInputs = null;
+
+				// --------------------------------------------------------------------------------
+				// Сфокусированные элементы
+
+				this._focusedInputs = Object.create(null);
 
 				// --------------------------------------------------------------------------------
 				// Целевой элемент
@@ -1100,10 +1131,10 @@
 				// ------------------------------------------------------------
 
 				if (
-					["input","textarea"].indexOf(target.tagName.toLowerCase()) != -1
+					$.inArray(target.tagName.toLowerCase(), ["input","textarea"]) != -1
 					|| (
-					target.type
-					&& ["text", "password", "email", "url", "search", "tel"].indexOf(target.type.toLowerCase()) != -1
+						target.type
+						&& $.inArray(target.type.toLowerCase(), ["text", "password", "email", "url", "search", "tel"]) != -1
 					)
 				){
 
@@ -1128,31 +1159,38 @@
 
 				// --------------------------------------------------------------
 
-				body.addEventListener(
-					'click', function(e){
-						self._deactivateInstances(e);
-					}, null
-				);
+				if (self.instances.length < 2){
+					$(body).bind(
+						"click",
+						function(e){
+							self._deactivateInstances(e);
+						}, null
+					);
+				}
 
 			},
 
 
 			"calcPosition" : function(){
 				var self = this;
+				var body = $("body").get(0);
 				var target = this.get("target");
 				var dbox = this.get("dbox");
+				var jqDBox = $(dbox);
 				var offset = $(target).offset();
 				var thisWidth = target.clientWidth;
 				var thisHeight = target.clientHeight;
 				var dboxWidth = dbox.clientWidth;
 
-				dbox.classList.remove("MSelectDBox_bottom");
+				jqDBox.removeClass("MSelectDBox_bottom");
 
 				dbox.style.left = (offset.left + (thisWidth / 2) - ((dboxWidth + (self.styles.dboxPaddings * 2)) / 2)) + "px";
 
+				var scrollY = window.scrollY || body.scrollTop;
+
 				if ( (dbox.clientHeight + offset.top + thisHeight + 12 - scrollY) > window.innerHeight){
 					dbox.style.top = (offset.top - 12 - dbox.clientHeight) + "px";
-					dbox.classList.add("MSelectDBox_bottom");
+					jqDBox.addClass("MSelectDBox_bottom");
 				} else {
 					dbox.style.top = (offset.top + thisHeight + 12) + "px";
 				}
@@ -1191,7 +1229,7 @@
 			"_isDBoxElement": function(element){
 				var dbox = this.get("dbox");
 				// var each = $("*", dbox).toArray();
-				var each = dbox.querySelectorAll("*");
+				var each = $(dbox).find("*");
 				if (each){
 					each = Array.prototype.slice.call(each,0);
 					each.push(dbox);
@@ -1207,7 +1245,7 @@
 			"_isTargetElement": function(element){
 				var target = this.get("target");
 				// var each = $("*",target).toArray();
-				var each = target.querySelectorAll("*");
+				var each = $(target).find("*");
 				if (each){
 					each = Array.prototype.slice.call(each,0);
 					each.push(target);
@@ -1272,21 +1310,48 @@
 			},
 
 
+			"hasValue": function(value){
+
+				var list = this.get("list");
+
+				for(var c=0; c<list.length; c++){
+					if (  list[c].value === value  ) return true;
+				}
+
+				return false;
+
+			},
+
+
+			"hasLabel": function(label){
+
+				var list = this.get("list");
+
+				for(var c=0; c<list.length; c++){
+					if (  list[c].label === label  ) return true;
+				}
+
+				return false;
+
+			},
+
+
 			"applySelectedToList" : function(){
 				// var self = this;
 				var dbox = this.get("dbox");
 				var list = this.get("list");
 
 				var li = $("li",dbox);
+
+				li.removeClass("MSelectDBox__list-item_selected");
+
 				for(var c= 0, L=li.length; c<L; c++){
 					var msdbid = li[c].getAttribute("data-msdbid");
 					if (
 						typeof list[msdbid] != "undefined"
 						&& list[msdbid].selected
 					){
-						li[c].classList.add('MSelectDBox__list-item_selected');
-					} else {
-						li[c].classList.remove('MSelectDBox__list-item_selected');
+						$(li[c]).addClass('MSelectDBox__list-item_selected');
 					}
 				}
 			},
@@ -1304,7 +1369,7 @@
 
 					if (
 						target.type
-						&& ["text", "password", "email", "url", "search", "tel"].indexOf(target.type.toLowerCase()) != -1
+						&& $.inArray(target.type.toLowerCase(), ["text", "password", "email", "url", "search", "tel"]) != -1
 					){
 						target.value = listLabel.join("; ") + (!listLabel.length || !this.get("multiple") ? "" : ";");
 					}
@@ -1316,7 +1381,7 @@
 				} else if ( tagName == "select" ) {
 
 					for (var v=0; v<target.options.length; v++) {
-						target.options[v].selected = (listValue.indexOf(target.options[v].value > -1));
+						target.options[v].selected = $.inArray(target.options[v].value, listValue) > -1;
 					}
 
 				}
@@ -1327,14 +1392,14 @@
 
 
 			"select" : function(arg){
-				if (typeof arg != "object" || Array.isArray(arg)) return;
+				if (typeof arg != "object" || $.isArray(arg)) return;
 
 				var value, key, blank = true;
 
 				if (typeof arg.blank != "undefined") blank = Boolean(arg.blank);
 
 				if (arg.id){
-					if (  !isNaN(arg.id) || Array.isArray(arg.id)  ){
+					if (  !isNaN(arg.id) || $.isArray(arg.id)  ){
 						this._selectByID(parseInt(arg.id));
 						return;
 					}
@@ -1350,11 +1415,11 @@
 					return;
 				}
 
-				if (["number", "string"].indexOf(typeof value) > -1) {
+				if (  $.inArray(typeof value, ["number", "string"]) > -1  ) {
 					value = [value];
 				} else if (
 					typeof value == "object"
-					&& Array.isArray(value)
+					&& $.isArray(value)
 				) {
 
 				} else {
@@ -1366,10 +1431,12 @@
 				var list = this.get("list");
 
 				for(var c=0, L=list.length; c<L; c++){
-					if ( value.indexOf(list[c][key]) > -1 ){
+					if (  $.inArray(list[c][key], value) > -1  ){
 						list[c].selected = true;
+
 					} else if ( blank ) {
 						list[c].selected = false;
+
 					}
 				}
 
@@ -1384,7 +1451,7 @@
 
 				if (  !isNaN(arg)  ){
 					arg = [parseInt(arg)];
-				} else if (  Array.isArray(arg)  ) {
+				} else if (  $.isArray(arg)  ) {
 
 				} else {
 					return;
@@ -1417,7 +1484,7 @@
 
 				if (  !isNaN(arg)  ){
 					arg = [parseInt(arg)];
-				} else if (  Array.isArray(arg)  ) {
+				} else if (  $.isArray(arg)  ) {
 
 				} else {
 					return;
@@ -1441,7 +1508,7 @@
 			"_optionFiltersMatcher": function(filters, matcherStr, matchedStr){
 				if (arguments.length < 3) return true;
 				if (typeof filters == "function") filters = [filters];
-				if (!Array.isArray(filters)) return false;
+				if (!$.isArray(filters)) return false;
 				for(var c=0; c<filters.length; c++){
 					if (  filters[c].apply(this, [matcherStr, matchedStr])  ){
 						return true;
@@ -1536,7 +1603,7 @@
 
 			"isActive": function(){
 				var dbox = this.get("dbox");
-				return dbox.classList.contains("MSelectDBox_hidden") == false
+				return $(dbox).hasClass("MSelectDBox_hidden") == false
 			},
 
 
@@ -1553,14 +1620,14 @@
 
 			"close" : function(){
 				var dbox = this.get("dbox");
-				dbox.classList.add("MSelectDBox_hidden");
+				$(dbox).addClass("MSelectDBox_hidden");
 			},
 
 
 
 			"open" : function(){
 				var dbox = this.get("dbox");
-				dbox.classList.remove("MSelectDBox_hidden");
+				$(dbox).removeClass("MSelectDBox_hidden");
 				this.calcPosition();
 			},
 
@@ -1587,22 +1654,22 @@
 
 					if ( _mode == 'both' ){
 						for(;;){
-							if ( !str.length || !(_chars.indexOf(str[0]) != -1 || _chars.indexOf(str[str.length-1]) != -1) ) break;
-							if ( _chars.indexOf(str[str.length-1]) != -1 ) str.pop();
-							if ( _chars.indexOf(str[0]) != -1 ) str.shift();
+							if ( !str.length || !($.inArray(str[0], _chars) != -1 || $.inArray(str[str.length-1], _chars) != -1) ) break;
+							if ($.inArray(str[str.length-1], _chars) != -1 ) str.pop();
+							if ($.inArray(str[0], _chars) != -1 ) str.shift();
 						}
 					}
 
 					if ( _mode == 'left' ){
 						for(;;){
-							if ( !str.length || _chars.indexOf(str[0]) == -1 ) break;
+							if ( !str.length || $.inArray(str[0], _chars) == -1 ) break;
 							str.shift();
 						}
 					}
 
 					if ( _mode == 'right' ){
 						for(;;){
-							if ( !str.length || _chars.indexOf(str[str.length-1]) == -1 ) break;
+							if ( !str.length || $.inArray(str[str.length-1], _chars) == -1 ) break;
 							str.pop();
 						}
 					}
@@ -1642,7 +1709,7 @@
 					return instance;
 
 				} else if (typeof arg == "string"){
-					if (  methodsList.indexOf(arg) > -1  ){
+					if (  $.inArray(arg, methodsList) > -1  ){
 						var rest = MSelectDBox.prototype.fx.rest(arguments,1);
 						if (  typeof instance[arg] == "function"  ){
 							return instance[arg].apply(instance, rest);
