@@ -52,6 +52,36 @@
 				outline: none;
 			}
 
+			.std-button {
+				padding: 5px 10px;
+				border: 2px solid #464C4F;
+				background-color: #ffffff;
+				display: inline-block;
+				text-align: center;
+				color: black;
+				-webkit-border-radius: 3px;
+				-moz-border-radius: 3px;
+				border-radius: 3px;
+				font-size: 13px;
+				cursor: pointer;
+				outline:none;
+			}
+
+			.std-button:hover {
+				/*background-color: mediumseagreen;*/
+				border-color: mediumseagreen;
+				color:mediumseagreen;
+			}
+
+			.std-button:active {
+				background-color: mediumseagreen;
+				color:white;
+			}
+
+			.std-button:focus {
+				box-shadow: 0 0 12px #3CB371;
+			}
+
 		</style>
 		<script type="application/javascript" src="./js/jquery-2.2.2.min.js"></script>
 		<script type="application/javascript" src="./js/MSelectDBox.js"></script>
@@ -69,6 +99,11 @@
 				Math.rand = function(min,max){
 					return Math.floor(Math.random() * (max - min + 1)) + min;
 				};
+
+				$.prototype.mSelectDBox.prototype._globalStyles[".MSelectDBox__list-item_selected"]["background-color"] = "mediumseagreen";
+				$.prototype.mSelectDBox.prototype._globalStyles[".MSelectDBox__list-item_selected:hover, .MSelectDBox__list-item_selected.MSelectDBox__list-item_hover"]["background-color"] = "green";
+				$.prototype.mSelectDBox.prototype._globalStyles[".MSelectDBox__list-item:active, .MSelectDBox__list-item_selected:active"]["background-color"] = "darkgreen";
+
 
 				$("#msdb-a").mSelectDBox({
 					"list": (function(){
@@ -129,6 +164,21 @@
 					]
 				});
 
+				$("#msdb-d").mSelectDBox({
+					"list": [
+						"Petrenko (muhomor)",
+						"Larin",
+						"Abdulova",
+						"Dukalis",
+						"Kazantsev",
+						"Volkov",
+						"Solovets",
+						"Cherdyntsev"
+					],
+					"multiple": 1,
+					"name": "d"
+				});
+
 			});
 		</script>
 	</head>
@@ -137,7 +187,7 @@
 	<div class="std-plate std-plate_thick-pad std-plate_rounded" style="display:inline-block;">
 		<table class="form-table" style="width:420px;">
 			<tr>
-				<td style="width:256px;">Multiselect = false, autoComplete = true: </td>
+				<td style="width:256px;">multiple = false, autoComplete = true: </td>
 				<td>
 					<label>
 						<input id="msdb-a" class="std-input" type="text">
@@ -145,7 +195,7 @@
 				</td>
 			</tr>
 			<tr>
-				<td>Multiselect = true, autoComplete = true: </td>
+				<td>multiple = true, autoComplete = true: </td>
 				<td>
 					<label>
 						<input id="msdb-b" class="std-input" type="text">
@@ -153,10 +203,18 @@
 				</td>
 			</tr>
 			<tr>
-				<td>Multiselect = true, autoComplete = true, optionFilters=[default, russianKeyboard]: </td>
+				<td>multiple = true, autoComplete = true, optionFilters=[default, russianKeyboard]: </td>
 				<td>
 					<label>
 						<input id="msdb-c" class="std-input" type="text">
+					</label>
+				</td>
+			</tr>
+			<tr>
+				<td>multiple = true</td>
+				<td>
+					<label>
+						<input type="button" id="msdb-d" class="std-button" value="Select options">
 					</label>
 				</td>
 			</tr>

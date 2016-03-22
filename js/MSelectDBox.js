@@ -11,6 +11,12 @@
 			"instances": [],
 
 
+			/**
+			 * @param {String} key - key of instance property
+			 * @param {Object=} arg - optional arguments,
+			 * @param {Boolean} e - event trigger on|off. If "false"  then "get" won't trigger event
+			 * @return {*}
+			 * */
 			"get" : function(key,arg,e){
 
 				var self = this, tmp;
@@ -57,6 +63,13 @@
 			},
 
 
+			/**
+			 * @param {String} key - key of instance property
+			 * @param {*} value
+			 * @param {Object=} arg - optional arguments,
+			 * @param {Boolean} e - event trigger on|off. If "false"  then "set" won't trigger event
+			 * @return {Boolean}
+			 * */
 			"set" : function(key,value,arg,e){
 
 				var self = this, tmp;
@@ -123,11 +136,16 @@
 			},
 
 
+
 			"getInstaces" : function(){
 				return this.getInstances.apply(this, arguments);
 			},
 
 
+			/**
+			 * @description return instance of class
+			 * @return {MSelectDBox}
+			 * */
 			"getInstances": function(arg){
 				if (!arguments.length) return this.instances;
 
@@ -146,6 +164,12 @@
 			},
 
 
+
+			/**
+			 * @description Remove instances
+			 * @param {Object} arg - arguments
+			 * @param {String} arg.name - Instance name // msdb.get("name")
+			 * */
 			"removeInstances": function(arg){
 				if (typeof arg != "object"){
 					return;
@@ -174,6 +198,9 @@
 			],
 
 
+			/**
+			 * @ignore
+			 * */
 			"_eventCheckInputEmpty": function(e){
 				var target = this.get("target");
 				var list = this.get("list");
@@ -190,21 +217,33 @@
 			},
 
 
+			/**
+			 * @ignore
+			 * */
 			"_eventDefaultInputEmpty": function(){
 				this.deselectAll();
 			},
 
 
+			/**
+			 * @ignore
+			 * */
 			"_eventDefaultSet": function(){
 				this.trigger(arguments[1].type, arguments[1]);
 			},
 
 
+			/**
+			 * @ignore
+			 * */
 			"_eventDefaultGet": function(){
 				this.trigger(arguments[1].type, arguments[1]);
 			},
 
 
+			/**
+			 * @ignore
+			 * */
 			"_eventSetList": function(){
 				var e = arguments[1];
 				this.set("list", e.value, null, false);
@@ -212,6 +251,9 @@
 			},
 
 
+			/**
+			 * @ignore
+			 * */
 			"_eventDefaultKeyUp": function(e){
 
 				var self						= this;
@@ -292,6 +334,9 @@
 			},
 
 
+			/**
+			 * @ignore
+			 * */
 			"_eventDefaultKeyDownMultipleFalse": function(e){
 
 				var self = this;
@@ -369,6 +414,9 @@
 			},
 
 
+			/**
+			 * @ignore
+			 * */
 			"_eventDefaultKeyDownMultipleTrue": function(e){
 
 				var self = this, c, L;
@@ -449,6 +497,9 @@
 			},
 
 
+			/**
+			 * @ignore
+			 * */
 			"_eventFocus": function(context,e){
 				var msdb_value, c, v;
 
@@ -535,6 +586,9 @@
 			},
 
 
+			/**
+			 * @ignore
+			 * */
 			"_initEvents": function(arg){
 				var eventName;
 
@@ -599,15 +653,24 @@
 				this.on(
 					"focusout",
 					function(context, e){
-						if (e.relatedTarget){
-							if (
-								self._isDBoxElement(e.relatedTarget)
-								|| self._isTargetElement(e.relatedTarget)
-							){
-								return;
-							}
-							self.close();
+						if (  !e.relatedTarget  ) {
+							self._timers.focusoutInputs = setTimeout(
+								function(){
+									self.close();
+								},
+								250
+							);
+							return;
 						}
+
+						if (
+							self._isDBoxElement(e.relatedTarget)
+							|| self._isTargetElement(e.relatedTarget)
+						){
+							return;
+						}
+
+						self.close();
 					}
 				);
 
@@ -629,6 +692,9 @@
 			},
 
 
+			/**
+			 * @ignore
+			 * */
 			"_deactivateInstances": function(e){
 				for(var c=0; c<this.instances.length; c++){
 					if (
@@ -642,6 +708,9 @@
 			},
 
 
+			/**
+			 * @ignore
+			 * */
 			"_initTarget": function(){
 				var target = this.get("target");
 				var c;
@@ -675,6 +744,11 @@
 			},
 
 
+			/**
+			 * @description Fire specified event
+			 * @param {String} eventName
+			 * @param {Event} e - Event object
+			 * */
 			"trigger": function(eventName, e){
 
 				var self = this;
@@ -711,6 +785,12 @@
 			},
 
 
+			/**
+			 * @description attach specified event listener
+			 * @param {String} eventName
+			 * @param  {Function} fx - Event handler
+			 * @return {Boolean}
+			 * */
 			"on": function(eventName, fx){
 				var c, self = this;
 				var target = this.get("target");
@@ -756,47 +836,102 @@
 			},
 
 
+			/**
+			 * @description Global styles by selectors
+			 * */
+			"_globalStyles": {
+				".MSelectDBox": {
+					position: "absolute", display: "block", width: "168px", padding: '8px', height: "auto", "box-shadow": "0 0px 8px rgba(0, 0, 0, 0.24)", "background-color": "#FFF", "border-radius": "3px"
+				},
+				".MSelectDBox_hidden": {
+					display: "none"
+				},
+				".MSelectDBox:after": {
+					content:'\'\'', position: "absolute", "border-left": "10px solid transparent", "border-right": "9px solid transparent", "border-bottom": "10px solid white", top: "-10px", left: "50%", "margin-left": "margin-left"
+				},
+				".MSelectDBox_bottom:after": {
+					content:'\'\'', position: "absolute", "border-left": "10px solid transparent", "border-right": "9px solid transparent", "border-bottom": "none", "border-top": "10px solid white", top: "initial", bottom: "-10px", left: "50%", "margin-left": "-10px",
+				},
+				".MSelectDBox__list-container": {
+					position: "relative", margin: "0px", padding: "0px", "max-height": "200px", "overflow-x": "hidden"
+				},
+				".MSelectDBox__list-item": {
+					position: "relative", padding: "5px", "background-color": "none", color: "black", display: "block", "line-height": "100%", cursor: "pointer", "font-size": "12px"
+				},
+				".MSelectDBox__list-item:hover, .MSelectDBox__list-item_hover": {
+					"background-color": "#e6e6e6"
+				},
+				".MSelectDBox__list-item_selected": {
+					"background-color": "#C40056", color:"white"
+				},
+				".MSelectDBox__list-item_selected:hover, .MSelectDBox__list-item_selected.MSelectDBox__list-item_hover": {
+					"background-color": "#DB2277"
+				},
+				".MSelectDBox__list-item_selected:before": {
+					content:'\':: \''
+				},
+				".MSelectDBox__list-item:active, .MSelectDBox__list-item_selected:active": {
+					"background-color": "#b80000", color: "white"
+				},
+				".MSelectDBox__list-item_hidden": {
+					display:"none"
+				},
+				".MSelectDBox__search-input": {
+					border: "1px solid #a2a2a2", width: "100%"
+				},
+				".MSelectDBox__search-input-container": {
+					"margin-bottom": "12px"
+				}
+			},
+
+
+			/**
+			 * @ignore
+			 * */
 			"_initStyles": function(){
 
-				var body = $("body").get(0);
-
-				this.styles = Object.create(null);
-
-				this.styles.dboxPaddings = 8;
-				this.styles.listItem_itemColor = null;
-				this.styles.listItem_selectedColor = null;
-				this.styles.listItem_hoverColor = null;
-				this.styles.listItem_selectedHoverColor = null;
-
 				if (  !$('#mSelectDBoxStyle').length  ){
-					var stylecss = ''
-						+' .MSelectDBox'																								+'{position:absolute; display:block; width:168px; padding:'+this.styles.dboxPaddings+'px; height:auto; box-shadow:0px 0px 8px rgba(0, 0, 0, 0.24); background-color: #FFF; border-radius: 3px;}'
-						+' .MSelectDBox_hidden'																						+'{display:none;}'
-						+' .MSelectDBox:after'																						+'{content:\'\'; position:absolute; border-left:10px solid transparent; border-right:9px solid transparent; border-bottom:10px solid white; top: -10px; left: 50%; margin-left: -10px;}'
-						+' .MSelectDBox_bottom:after'																			+'{content:\'\'; position:absolute; border-left:10px solid transparent; border-right:9px solid transparent; border-bottom: none; border-top:10px solid white; top: initial; bottom: -10px; left: 50%; margin-left: -10px;}'
-						+' .MSelectDBox__list-container'																			+'{position:relative; margin:0px; padding:0px; max-height:200px; overflow-x:hidden;}'
-						+' .MSelectDBox__list-item'																					+'{position:relative; padding:5px; color:black; display:block; line-height:100%; cursor:pointer; font-size:12px;}'
-						+' .MSelectDBox__list-item:hover, .MSelectDBox__list-item_hover'							+'{background-color:#e6e6e6;}'
-						+' .MSelectDBox__list-item_selected'																	+'{background-color:#C40056; color:white;}'
-						+' .MSelectDBox__list-item_selected:hover, .MSelectDBox__list-item_selected.MSelectDBox__list-item_hover{background-color:#DB2277;}'
-						+' .MSelectDBox__list-item_selected:before'															+'{content:\':: \';}'
-						+' .MSelectDBox__list-item:active, .MSelectDBox__list-item_selected:active'				+'{background-color:#b80000; color:white;}'
-						+' .MSelectDBox__list-item_hidden'																		+'{display:none;}'
-						+' .MSelectDBox__search-input'																			+'{border:1px solid #a2a2a2; width:100%;}'
-						+' .MSelectDBox__search-input-container'															+'{margin-bottom:12px;}'
-						+'';
-
-					// #DB2277
-
-					var style = document.createElement('style');
-					style.id = "mSelectDBoxStyle";
-					style.innerHTML = stylecss;
-					body.appendChild(style);
+					this._buildStyles();
 				}
 
 			},
 
 
+			/**
+			 * @ignore
+			 * */
+			"_buildStyles": function(){
+
+				var body = $("body");
+
+				var stylecss = "";
+
+				for(var styleSelector in this._globalStyles){
+					if (  !this._globalStyles.hasOwnProperty(styleSelector)  ) continue;
+					stylecss += styleSelector + "{";
+					for(var styleProp in this._globalStyles[styleSelector]){
+						if (  !this._globalStyles[styleSelector].hasOwnProperty(styleProp)  ) continue;
+						stylecss += styleProp + ":" + this._globalStyles[styleSelector][styleProp] + ";";
+					}
+					stylecss += "} ";
+				}
+
+				var styleElem = $('#mSelectDBoxStyle');
+
+				if (  !styleElem.length  ){
+					styleElem = $('<style />');
+					styleElem.attr("id", "mSelectDBoxStyle");
+					body.append(styleElem);
+				}
+
+				styleElem.html(stylecss);
+
+			},
+
+
+			/**
+			 * @ignore
+			 * */
 			"_initProps": function(arg){
 
 				// var self = this;
@@ -897,6 +1032,9 @@
 			},
 
 
+			/**
+			 * @ignore
+			 * */
 			"_initElements": function(){
 
 				var body = $("body").get(0);
@@ -947,6 +1085,9 @@
 			},
 
 
+			/**
+			 * @ignore
+			 * */
 			"_initList": function(){
 
 				var c, L;
@@ -1016,6 +1157,8 @@
 						function(e){
 							var selectedKeys = [];
 
+							clearTimeout(self._timers.focusoutInputs);
+
 							var msdbid = parseInt(this.getAttribute('data-msdbid'));
 
 							if (  self.get("multiple")  ){
@@ -1060,6 +1203,9 @@
 			},
 
 
+			/**
+			 * @ignore
+			 * */
 			"init": function(arg){
 
 				this._props = Object.create(null);
@@ -1094,11 +1240,7 @@
 				this._timers = Object.create(null);
 				this._timers.autoComplete = null;
 				this._timers.focusedInputs = null;
-
-				// --------------------------------------------------------------------------------
-				// Сфокусированные элементы
-
-				this._focusedInputs = Object.create(null);
+				this._timers.focusoutInputs = null;
 
 				// --------------------------------------------------------------------------------
 				// Целевой элемент
@@ -1171,6 +1313,9 @@
 			},
 
 
+			/**
+			 * @description Calculate position of list container
+			 * */
 			"calcPosition" : function(){
 				var self = this;
 				var body = $("body").get(0);
@@ -1184,7 +1329,7 @@
 
 				jqDBox.removeClass("MSelectDBox_bottom");
 
-				dbox.style.left = (offset.left + (thisWidth / 2) - ((dboxWidth + (self.styles.dboxPaddings * 2)) / 2)) + "px";
+				dbox.style.left = (offset.left + (thisWidth / 2) - ((dboxWidth + (self._globalStyles[".MSelectDBox"].padding.replace(/[px]/gi,"") * 2)) / 2)) + "px";
 
 				var scrollY = window.scrollY || body.scrollTop;
 
@@ -1197,6 +1342,9 @@
 			},
 
 
+			/**
+			 * @ignore
+			 * */
 			"_calcScrollBarPosition": function(){
 
 				var selectedLi;
@@ -1226,6 +1374,9 @@
 			},
 
 
+			/**
+			 * @ignore
+			 * */
 			"_isDBoxElement": function(element){
 				var dbox = this.get("dbox");
 				// var each = $("*", dbox).toArray();
@@ -1242,6 +1393,9 @@
 			},
 
 
+			/**
+			 * @ignore
+			 * */
 			"_isTargetElement": function(element){
 				var target = this.get("target");
 				// var each = $("*",target).toArray();
@@ -1261,6 +1415,10 @@
 			},
 
 
+			/**
+			 * @description Return keys of selected options
+			 * @return {Array}
+			 * */
 			"getSelectedKeys": function(){
 				var keys = [];
 				var list = this.get("list");
@@ -1278,6 +1436,10 @@
 			},
 
 
+			/**
+			 * @description Return values of selected options
+			 * @return {Array}
+			 * */
 			"getSelectedValues": function(){
 				var values = [];
 				var list = this.get("list");
@@ -1294,6 +1456,10 @@
 			},
 
 
+			/**
+			 * @description Return labels of selected options
+			 * @return {Array}
+			 * */
 			"getSelectedLabels": function(){
 				var labels = [];
 				var list = this.get("list");
@@ -1310,6 +1476,11 @@
 			},
 
 
+			/**
+			 * @description check existence of value in list
+			 * @param {String} value
+			 * @return {Boolean}
+			 * */
 			"hasValue": function(value){
 
 				var list = this.get("list");
@@ -1323,6 +1494,11 @@
 			},
 
 
+			/**
+			 * @description check existence of label in list
+			 * @param {String} label
+			 * @return {Boolean}
+			 * */
 			"hasLabel": function(label){
 
 				var list = this.get("list");
@@ -1391,6 +1567,12 @@
 			},
 
 
+			/**
+			 * @description Select specified option in list
+			 * @param {Object} arg
+			 * @param {String, Array} arg.value - select by value
+			 * @param {String, Array} arg.label - select by label
+			 * */
 			"select" : function(arg){
 				if (typeof arg != "object" || $.isArray(arg)) return;
 
@@ -1445,7 +1627,10 @@
 
 			},
 
-			// Каждый раз определяет новую выборку
+			/**
+			 * @description Выделяет пункт из списка по ключу. Каждый раз определяет новую выборку.
+			 * @ignore
+			 * */
 			"_selectByID": function(arg){
 				var c;
 
@@ -1476,7 +1661,10 @@
 
 			},
 
-			// Снимание выделение только с указанной выборки, не затрагивая остальные
+			/**
+			 * @description Сниманиет выделение только с указанной выборки, не затрагивая остальные
+			 * @ignore
+			 * */
 			"_deselectByID": function(arg){
 				var c;
 
@@ -1505,6 +1693,9 @@
 			},
 
 
+			/**
+			 * @ignore
+			 * */
 			"_optionFiltersMatcher": function(filters, matcherStr, matchedStr){
 				if (arguments.length < 3) return true;
 				if (typeof filters == "function") filters = [filters];
@@ -1518,6 +1709,9 @@
 			},
 
 
+			/**
+			 * @description default autoComplete filters
+			 * */
 			"defaultOptionFilters": {
 				"default": function(matcherStr, matchedStr){
 					if (
@@ -1573,6 +1767,9 @@
 			"_unhideItems": function(){},
 
 
+			/**
+			 * @description Deselect all options in list
+			 * */
 			"deselectAll" : function(){
 
 				var list = this.get("list");
@@ -1586,6 +1783,9 @@
 			},
 
 
+			/**
+			 * @description Select all options in list
+			 * */
 			"selectAll" : function(){
 				var list = this.get("list");
 
@@ -1601,6 +1801,10 @@
 			},
 
 
+			/**
+			 * @description check visible state of list container
+			 * @return {Boolean}
+			 * */
 			"isActive": function(){
 				var dbox = this.get("dbox");
 				return $(dbox).hasClass("MSelectDBox_hidden") == false
@@ -1618,13 +1822,18 @@
 			},
 
 
+			/**
+			 * @description hide list
+			 * */
 			"close" : function(){
 				var dbox = this.get("dbox");
 				$(dbox).addClass("MSelectDBox_hidden");
 			},
 
 
-
+			/**
+			 * @description show list
+			 * */
 			"open" : function(){
 				var dbox = this.get("dbox");
 				$(dbox).removeClass("MSelectDBox_hidden");
@@ -1632,7 +1841,9 @@
 			},
 
 
-
+			/**
+			 * @ignore
+			 * */
 			"fx" : {
 				"msplit" : function(d,s){
 					s = s.replace(new RegExp('['+d.join('')+']','g'),d[0]);
