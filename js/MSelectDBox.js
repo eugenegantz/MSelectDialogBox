@@ -3,6 +3,10 @@
 
 	(function($){
 
+		/**
+		 * @constructor
+		 * @global
+		 * */
 		var MSelectDBox = function(arg){
 			this.init(arg);
 		};
@@ -15,6 +19,7 @@
 			 * @param {String} key - key of instance property
 			 * @param {Object=} arg - optional arguments,
 			 * @param {Boolean} e - event trigger on|off. If "false"  then "get" won't trigger event
+			 * @memberof MSelectDBox
 			 * @return {*}
 			 * */
 			"get" : function(key,arg,e){
@@ -68,6 +73,7 @@
 			 * @param {*} value
 			 * @param {Object=} arg - optional arguments,
 			 * @param {Boolean} e - event trigger on|off. If "false"  then "set" won't trigger event
+			 * @memberof MSelectDBox
 			 * @return {Boolean}
 			 * */
 			"set" : function(key,value,arg,e){
@@ -144,6 +150,7 @@
 
 			/**
 			 * @description return instance of class
+			 * @memberof MSelectDBox
 			 * @return {MSelectDBox}
 			 * */
 			"getInstances": function(arg){
@@ -169,6 +176,7 @@
 			 * @description Remove instances
 			 * @param {Object} arg - arguments
 			 * @param {String} arg.name - Instance name // msdb.get("name")
+			 * @memberof MSelectDBox
 			 * */
 			"removeInstances": function(arg){
 				if (typeof arg != "object"){
@@ -748,6 +756,7 @@
 			 * @description Fire specified event
 			 * @param {String} eventName
 			 * @param {Event} e - Event object
+			 * @memberof MSelectDBox
 			 * */
 			"trigger": function(eventName, e){
 
@@ -790,6 +799,7 @@
 			 * @param {String} eventName
 			 * @param  {Function} fx - Event handler
 			 * @return {Boolean}
+			 * @memberof MSelectDBox
 			 * */
 			"on": function(eventName, fx){
 				var c, self = this;
@@ -838,6 +848,7 @@
 
 			/**
 			 * @description Global styles by selectors
+			 * @memberof MSelectDBox
 			 * */
 			"_globalStyles": {
 				".MSelectDBox": {
@@ -847,7 +858,7 @@
 					display: "none"
 				},
 				".MSelectDBox:after": {
-					content:'\'\'', position: "absolute", "border-left": "10px solid transparent", "border-right": "9px solid transparent", "border-bottom": "10px solid white", top: "-10px", left: "50%", "margin-left": "margin-left"
+					content:'\'\'', position: "absolute", "border-left": "10px solid transparent", "border-right": "9px solid transparent", "border-bottom": "10px solid white", top: "-10px", left: "50%", "margin-left": "-10px"
 				},
 				".MSelectDBox_bottom:after": {
 					content:'\'\'', position: "absolute", "border-left": "10px solid transparent", "border-right": "9px solid transparent", "border-bottom": "none", "border-top": "10px solid white", top: "initial", bottom: "-10px", left: "50%", "margin-left": "-10px",
@@ -1315,6 +1326,7 @@
 
 			/**
 			 * @description Calculate position of list container
+			 * @memberof MSelectDBox
 			 * */
 			"calcPosition" : function(){
 				var self = this;
@@ -1417,6 +1429,7 @@
 
 			/**
 			 * @description Return keys of selected options
+			 * @memberof MSelectDBox
 			 * @return {Array}
 			 * */
 			"getSelectedKeys": function(){
@@ -1438,6 +1451,7 @@
 
 			/**
 			 * @description Return values of selected options
+			 * @memberof MSelectDBox
 			 * @return {Array}
 			 * */
 			"getSelectedValues": function(){
@@ -1458,6 +1472,7 @@
 
 			/**
 			 * @description Return labels of selected options
+			 * @memberof MSelectDBox
 			 * @return {Array}
 			 * */
 			"getSelectedLabels": function(){
@@ -1479,6 +1494,7 @@
 			/**
 			 * @description check existence of value in list
 			 * @param {String} value
+			 * @memberof MSelectDBox
 			 * @return {Boolean}
 			 * */
 			"hasValue": function(value){
@@ -1497,6 +1513,7 @@
 			/**
 			 * @description check existence of label in list
 			 * @param {String} label
+			 * @memberof MSelectDBox
 			 * @return {Boolean}
 			 * */
 			"hasLabel": function(label){
@@ -1570,8 +1587,9 @@
 			/**
 			 * @description Select specified option in list
 			 * @param {Object} arg
-			 * @param {String, Array} arg.value - select by value
-			 * @param {String, Array} arg.label - select by label
+			 * @param {String | Array} arg.value - select by value
+			 * @param {String | Array} arg.label - select by label
+			 * @memberof MSelectDBox
 			 * */
 			"select" : function(arg){
 				if (typeof arg != "object" || $.isArray(arg)) return;
@@ -1629,6 +1647,7 @@
 
 			/**
 			 * @description Выделяет пункт из списка по ключу. Каждый раз определяет новую выборку.
+			 * @memberof MSelectDBox
 			 * @ignore
 			 * */
 			"_selectByID": function(arg){
@@ -1663,6 +1682,7 @@
 
 			/**
 			 * @description Сниманиет выделение только с указанной выборки, не затрагивая остальные
+			 * @memberof MSelectDBox
 			 * @ignore
 			 * */
 			"_deselectByID": function(arg){
@@ -1711,6 +1731,7 @@
 
 			/**
 			 * @description default autoComplete filters
+			 * @memberof MSelectDBox
 			 * */
 			"defaultOptionFilters": {
 				"default": function(matcherStr, matchedStr){
@@ -1769,6 +1790,7 @@
 
 			/**
 			 * @description Deselect all options in list
+			 * @memberof MSelectDBox
 			 * */
 			"deselectAll" : function(){
 
@@ -1785,6 +1807,7 @@
 
 			/**
 			 * @description Select all options in list
+			 * @memberof MSelectDBox
 			 * */
 			"selectAll" : function(){
 				var list = this.get("list");
@@ -1803,6 +1826,7 @@
 
 			/**
 			 * @description check visible state of list container
+			 * @memberof MSelectDBox
 			 * @return {Boolean}
 			 * */
 			"isActive": function(){
@@ -1824,6 +1848,7 @@
 
 			/**
 			 * @description hide list
+			 * @memberof MSelectDBox
 			 * */
 			"close" : function(){
 				var dbox = this.get("dbox");
@@ -1833,6 +1858,7 @@
 
 			/**
 			 * @description show list
+			 * @memberof MSelectDBox
 			 * */
 			"open" : function(){
 				var dbox = this.get("dbox");

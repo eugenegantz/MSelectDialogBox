@@ -179,6 +179,24 @@
 					"name": "d"
 				});
 
+				var customFilterMatchLeft = function(inputString, optionString){
+					var pattern = new RegExp("^" + inputString.trim(),"ig");
+					optionString = String(optionString);
+					return Boolean(optionString.match(pattern));
+				};
+
+				$("#msdb-e").mSelectDBox({
+					"list": [
+						"aa-bb-cc-dd-1",
+						"bb-cc-dd-aa-2",
+						"cc-dd-aa-bb-3",
+						"dd-aa-bb-cc-4"
+					],
+					"optionFilters": [customFilterMatchLeft],
+					"multiple": false,
+					"autoComplete": true
+				});
+
 			});
 		</script>
 	</head>
@@ -207,6 +225,14 @@
 				<td>
 					<label>
 						<input id="msdb-c" class="std-input" type="text">
+					</label>
+				</td>
+			</tr>
+			<tr>
+				<td>multiple = false, autoComplete = true, optionFilters=[matchLeft]: </td>
+				<td>
+					<label>
+						<input id="msdb-e" class="std-input" type="text">
 					</label>
 				</td>
 			</tr>

@@ -89,18 +89,14 @@ $("#selector").mSelectDBox(
 
 Пример такой функции:
 ~~~~~ javascript
-function([String] matcher, [String] matched){
-	if (
-		typeof matcher != "string"
-		|| typeof matched != "string"
-	){
-		return false;
-	}
-
-	var pattern = new RegExp(matcher.toLowerCase().trim());
-	matched = matched.toString().toLowerCase();
-
-	return Boolean(matched.match(pattern));
+/**
+* @param {String} inputString
+* @param {String | Number} optionString
+*/
+function(inputString, optionString){
+	var pattern = new RegExp(inputString.trim(),"ig");
+	optionString = String(optionString);
+	return Boolean(optionString.match(pattern));
 }
 ~~~~~
 
