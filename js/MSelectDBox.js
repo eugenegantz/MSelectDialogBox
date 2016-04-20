@@ -4,10 +4,9 @@
 	(function($){
 
 		/**
-		 * @author Eugene Gantz <EugenGantz@gmail.com>
+		 * @author Eugene Gantz (EG) <EugenGantz@gmail.com>
 		 * @constructor
 		 * @global
-		 * @class
 		 * @param {Object} arg
 		 * @param {String=} arg.name - instance name
 		 * @param {Array} arg.list - list options
@@ -17,7 +16,7 @@
 		 * @param {String | Number=} arg.width
 		 * @param {Array=} arg.optionFilters
 		 * @param {Boolean} arg.freeWrite
-		 * */
+		 **/
 		var MSelectDBox = function(arg){
 			this.init(arg);
 		};
@@ -811,6 +810,7 @@
 			 * @param  {Function} fx - Event handler
 			 * @memberof MSelectDBox
 			 * @return {Boolean}
+			 * @memberof MSelectDBox
 			 * */
 			"on": function(eventName, fx){
 				var c, self = this;
@@ -869,7 +869,7 @@
 					display: "none"
 				},
 				".MSelectDBox:after": {
-					content:'\'\'', position: "absolute", "border-left": "10px solid transparent", "border-right": "9px solid transparent", "border-bottom": "10px solid white", top: "-10px", left: "50%", "margin-left": "margin-left"
+					content:'\'\'', position: "absolute", "border-left": "10px solid transparent", "border-right": "9px solid transparent", "border-bottom": "10px solid white", top: "-10px", left: "50%", "margin-left": "-10px"
 				},
 				".MSelectDBox_bottom:after": {
 					content:'\'\'', position: "absolute", "border-left": "10px solid transparent", "border-right": "9px solid transparent", "border-bottom": "none", "border-top": "10px solid white", top: "initial", bottom: "-10px", left: "50%", "margin-left": "-10px",
@@ -1935,7 +1935,7 @@
 
 		// ---------------------------------------------------------------------------------------------------
 
-		var methodsList = ["open","close","isActive","get","set","select","selectAll","deselectAll","on","trigger"];
+		var methodsList = ["open","close","isActive","get","set","select","selectAll","deselectAll","on","trigger", "getSelectedLabels", "getSelectedValues", "getSelectedKeys"];
 
 		$.fn.extend({
 			"mSelectDBox":  function(arg){

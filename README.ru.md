@@ -89,18 +89,14 @@ $("#selector").mSelectDBox(
 
 Пример такой функции:
 ~~~~~ javascript
-function([String] matcher, [String] matched){
-	if (
-		typeof matcher != "string"
-		|| typeof matched != "string"
-	){
-		return false;
-	}
-
-	var pattern = new RegExp(matcher.toLowerCase().trim());
-	matched = matched.toString().toLowerCase();
-
-	return Boolean(matched.match(pattern));
+/**
+* @param {String} inputString
+* @param {String | Number} optionString
+*/
+function(inputString, optionString){
+	var pattern = new RegExp(inputString.trim(),"ig");
+	optionString = String(optionString);
+	return Boolean(optionString.match(pattern));
 }
 ~~~~~
 
@@ -260,6 +256,28 @@ dbox.select({"value": "0"});
 Альтернатива:
 ~~~~~ javascript
 $("#selector").mSelectDBox("select",{"label": ["100", "200"]});
+~~~~~
+
+####getSelectedLabels####
+Возвращает массив названий (label) выбранных элементов списка
+~~~~~ javascript
+var array = $("#selector").mSelectDBox("getSelectedLabels");
+~~~~~
+
+Альтернатива:
+~~~~~ javascript
+var array = $("#selector").mSelectDBox().getSelectedLabels();
+~~~~~
+
+####getSelectedValues####
+Возвращает массив значений (value) выбранных элементов списка
+~~~~~ javascript
+var array = $("#selector").mSelectDBox("getSelectedValues");
+~~~~~
+
+Альтернатива:
+~~~~~ javascript
+var array = $("#selector").mSelectDBox().getSelectedValues();
 ~~~~~
 
 ####selectAll####
