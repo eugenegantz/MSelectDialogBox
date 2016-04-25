@@ -24,6 +24,12 @@
 		MSelectDBox.prototype = {
 			"instances": [],
 
+			/**
+			 * Индикатор холодной загрузки.
+			 * После первой загрузки класса становится true
+			 * */
+			"_coldInit": 0,
+
 
 			/**
 			 * @param {String} key - key of instance property
@@ -698,14 +704,14 @@
 
 				// ----------------------------------------------------------------
 
-				/*
-				body.addEventListener(
-					"click",
-					function(){
-						// ...
-					}
-				);
-				*/
+				var listContainer = $(this.get("dbox")).find(".MSelectDBox__list-container").get(0);
+
+				window.addEventListener("resize", function(){
+					var vh = window.innerHeight / 100;
+					listContainer.style.height = ((vh * 80) - 64) + "px";
+				}, false);
+
+				// ----------------------------------------------------------------
 
 			},
 
@@ -878,7 +884,7 @@
 					position: "relative", margin: "0px", padding: "0px", "max-height": "200px", "overflow-x": "hidden"
 				},
 				".MSelectDBox__list-item": {
-					position: "relative", padding: "5px", "background-color": "none", color: "black", display: "block", "line-height": "100%", cursor: "pointer", "font-size": "12px"
+					position: "relative", padding: "5px", "background-color": "initial", color: "black", display: "block", "line-height": "100%", cursor: "pointer", "font-size": "12px"
 				},
 				".MSelectDBox__list-item:hover, .MSelectDBox__list-item_hover": {
 					"background-color": "#e6e6e6"
@@ -899,10 +905,27 @@
 					display:"none"
 				},
 				".MSelectDBox__search-input": {
-					border: "1px solid #a2a2a2", width: "100%"
+					border: "1px solid #a2a2a2", width: "100%", "line-height": "1em", "font-size": "1em", "border-width": "0 0 2px 0", "padding": "1em", "box-sizing": "border-box"
 				},
 				".MSelectDBox__search-input-container": {
-					"margin-bottom": "12px"
+					"margin-bottom": "12px", display: "none"
+				},
+				"@media screen and (max-width: 640px)": {
+					".MSelectDBox": {
+						position: "fixed", width: "80% !important", padding: "0 !important", left: "10% !important", top:"10% !important", "max-height": "80%", "box-shadow": "none", "border-radius": "0px", "box-sizing": "border-box"
+					},
+					".MSelectDBox:after": {
+						content: "initial"
+					},
+					".MSelectDBox__list-container": {
+						"max-height": "initial"
+					},
+					".MSelectDBox__list-item": {
+						padding: "1em", "font-size": "1em"
+					},
+					".MSelectDBox__search-input-container": {
+						"margin-bottom": "12px", display: "block"
+					}
 				}
 			},
 
@@ -926,17 +949,25 @@
 
 				var body = $("body");
 
-				var stylecss = "";
-
-				for(var styleSelector in this._globalStyles){
-					if (  !this._globalStyles.hasOwnProperty(styleSelector)  ) continue;
-					stylecss += styleSelector + "{";
-					for(var styleProp in this._globalStyles[styleSelector]){
-						if (  !this._globalStyles[styleSelector].hasOwnProperty(styleProp)  ) continue;
-						stylecss += styleProp + ":" + this._globalStyles[styleSelector][styleProp] + ";";
+				var buildCSS= function(obj){
+					var str = "";
+					for(var styleSelector in obj){
+						if (  !Object.prototype.hasOwnProperty.call(obj, styleSelector)  ) continue;
+						if (  styleSelector.match("^@media")  ){
+							str += styleSelector + " {" + buildCSS(obj[styleSelector]) + "} ";
+							continue;
+						}
+						str += styleSelector + " {";
+						for(var styleProp in obj[styleSelector]){
+							if (  !Object.prototype.hasOwnProperty.call(obj[styleSelector], styleProp)  ) continue;
+							str += styleProp + ":" + obj[styleSelector][styleProp] + ";";
+						}
+						str += "} ";
 					}
-					stylecss += "} ";
-				}
+					return str;
+				};
+
+				var css = buildCSS(this._globalStyles);
 
 				var styleElem = $('#mSelectDBoxStyle');
 
@@ -946,7 +977,7 @@
 					body.append(styleElem);
 				}
 
-				styleElem.html(stylecss);
+				styleElem.html(css);
 
 			},
 
@@ -1071,7 +1102,7 @@
 
 				var searchInputContainer = $(
 					'<div class="MSelectDBox__search-input-container">' +
-					'<input class="MSelectDBox__search-input" type="text">' +
+					'<input class="MSelectDBox__search-input" placeholder="Search " type="text">' +
 					'</div>'
 				).get(0);
 
@@ -1080,7 +1111,7 @@
 				dbox.appendChild(searchInputContainer);
 
 				if (  !this.get("builtInInput")  ){
-					searchInputContainer.style.display = "none";
+					// searchInputContainer.style.display = "none";
 				}
 
 				this.set("dbox", dbox);
@@ -1249,6 +1280,7 @@
 
 				this.events = Object.create(null);
 
+				this._coldInit = 1;
 				this._initProps(arg);
 				this._initTarget();
 				this._initEvents(arg);
