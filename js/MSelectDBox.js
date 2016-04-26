@@ -34,13 +34,13 @@
 			/**
 			 * @param {String} key - key of instance property
 			 * @param {Object=} arg - optional arguments,
-			 * @param {Boolean} e - event trigger on|off. If "false"  then "get" won't trigger event
+			 * @param {Boolean=} e - event trigger on|off. If "false"  then "get" won't trigger event
 			 * @memberof MSelectDBox
 			 * @return {*}
 			 * */
 			"get" : function(key,arg,e){
 
-				var self = this, tmp;
+				var self = this;
 
 				if (typeof key != "string") return;
 
@@ -48,7 +48,7 @@
 
 				// .....................
 
-				if (typeof e == "undefined") e = 1;
+				if (typeof e == "undefined") e = true;
 
 				var eTrigger = function(name){
 					if (e){
@@ -88,7 +88,7 @@
 			 * @param {String} key - key of instance property
 			 * @param {*} value
 			 * @param {Object=} arg - optional arguments,
-			 * @param {Boolean} e - event trigger on|off. If "false"  then "set" won't trigger event
+			 * @param {Boolean=} e - event trigger on|off. If "false"  then "set" won't trigger event
 			 * @memberof MSelectDBox
 			 * @return {Boolean}
 			 * */
@@ -114,7 +114,7 @@
 
 				// .....................
 
-				if (typeof e == "undefined") e = 1;
+				if (typeof e == "undefined") e = true;
 
 				var eTrigger = function(name){
 					if (e){
@@ -167,7 +167,7 @@
 			/**
 			 * @description return instance of class
 			 * @memberof MSelectDBox
-			 * @return {MSelectDBox}
+			 * @return {Array}
 			 * */
 			"getInstances": function(arg){
 				if (!arguments.length) return this.instances;
@@ -276,6 +276,19 @@
 
 
 			/**
+			 * При изм. размера окна происходит пересчет размеров внутри видимых списков
+			 * @ignore
+			 * */
+			"_eventWindowResize": function(){
+				for(var c=0; c<this.instances.length; c++){
+					if (  this.instances[c].isActive()  ){
+						this._calcListContainerHeight();
+					}
+				}
+			},
+
+
+			/**
 			 * @ignore
 			 * */
 			"_eventDefaultKeyUp": function(e){
@@ -299,7 +312,7 @@
 
 						} else {
 
-							var li	= $(".MSelectDBox__list-item", dbox);
+							var li	= $(".m-select-d-box__list-item", dbox);
 							value	= target.value.toLowerCase();
 							// value	= self.fx.trim(value,";, ","both");
 							value	= self.fx.msplit([';',','],value);
@@ -312,19 +325,19 @@
 								var jqLi = $(li[v]);
 
 								if (  !value  ){
-									jqLi.removeClass('MSelectDBox__list-item_hidden');
+									jqLi.removeClass('m-select-d-box__list-item_hidden');
 
 								} else if (
 									!self._optionFiltersMatcher(self.get("optionFilters"), value, list[msdbid].label)
 								){
-									jqLi.addClass('MSelectDBox__list-item_hidden');
+									jqLi.addClass('m-select-d-box__list-item_hidden');
 
 								} else {
-									jqLi.removeClass('MSelectDBox__list-item_hidden');
+									jqLi.removeClass('m-select-d-box__list-item_hidden');
 
 								}
 
-								jqLi.removeClass('MSelectDBox__list-item_hover');
+								jqLi.removeClass('m-select-d-box__list-item_hover');
 							}
 						}
 
@@ -397,14 +410,14 @@
 
 					ul = $("ul", dbox).get(0);
 
-					li = $('li:not(.MSelectDBox__list-item_hidden)', dbox);
+					li = $('li:not(.m-select-d-box__list-item_hidden)', dbox);
 
 					var selectedLi = -1;
 					var jqli;
 
 					for(c=0, L=li.length; c<L; c++){
 						jqli = $(li[c]);
-						if (  jqli.hasClass("MSelectDBox__list-item_selected")  ){
+						if (  jqli.hasClass("m-select-d-box__list-item_selected")  ){
 							selectedLi = c;
 							break;
 						}
@@ -455,7 +468,7 @@
 
 					} else if (  e.keyCode == 13  ){
 						// Enter
-						var hoveredLi = $(".MSelectDBox__list-item_hover",dbox);
+						var hoveredLi = $(".m-select-d-box__list-item_hover",dbox);
 
 						if (  !hoveredLi.length  ) return;
 
@@ -483,16 +496,16 @@
 					if (  $.inArray(e.keyCode, [38,40]) > -1  ) {
 						// up, down
 
-						// var ul = $(".MSelectDBox__list-container", dbox);
+						// var ul = $(".m-select-d-box__list-container", dbox);
 
-						var li = $('.MSelectDBox__list-item:not(.MSelectDBox__list-item_hidden)', dbox);
+						var li = $('.m-select-d-box__list-item:not(.m-select-d-box__list-item_hidden)', dbox);
 
 						hoveredLi = -1;
 						var jqli;
 
 						for(c=0, L=li.length; c<L; c++){
 							jqli = $(li[c]);
-							if (  jqli.hasClass("MSelectDBox__list-item_hover")  ) {
+							if (  jqli.hasClass("m-select-d-box__list-item_hover")  ) {
 								hoveredLi = c;
 							}
 						}
@@ -509,10 +522,10 @@
 							return;
 						}
 
-						$(li[newHoveredLi]).addClass("MSelectDBox__list-item_hover");
+						$(li[newHoveredLi]).addClass("m-select-d-box__list-item_hover");
 
 						if (hoveredLi > -1 && newHoveredLi != hoveredLi){
-							$(li[hoveredLi]).removeClass("MSelectDBox__list-item_hover");
+							$(li[hoveredLi]).removeClass("m-select-d-box__list-item_hover");
 						}
 
 						self._calcScrollBarPosition();
@@ -575,7 +588,7 @@
 
 				if (dbox_li.length){
 					// Снять hover со строки
-					dbox_li.removeClass('MSelectDBox__list-item_hidden');
+					dbox_li.removeClass('m-select-d-box__list-item_hidden');
 					for (v=0; v<dbox_li.length; v++){
 						if (
 							(
@@ -586,7 +599,7 @@
 						){
 
 						} else {
-							$(dbox_li[v]).removeClass('MSelectDBox__list-item_hover');
+							$(dbox_li[v]).removeClass('m-select-d-box__list-item_hover');
 						}
 					}
 				}
@@ -604,6 +617,9 @@
 
 				// Положение ползунка
 				self._calcScrollBarPosition();
+
+				// Пересчет высоты внутри списка
+				self._calcListContainerHeight();
 
 				// Запустить событие
 				// self.trigger("focus", e);
@@ -645,8 +661,7 @@
 					if (!tmpEvents.hasOwnProperty(eventName)) continue;
 					this.on(
 						eventName,
-						tmpEvents[eventName],
-						false
+						tmpEvents[eventName]
 					);
 				}
 
@@ -704,12 +719,10 @@
 
 				// ----------------------------------------------------------------
 
-				var listContainer = $(this.get("dbox")).find(".MSelectDBox__list-container").get(0);
-
-				window.addEventListener("resize", function(){
-					var vh = window.innerHeight / 100;
-					listContainer.style.height = ((vh * 80) - 64) + "px";
-				}, false);
+				// При самой первой инициализации
+				if (  self._isColdInit()  ){
+					window.addEventListener("resize", self._eventWindowResize.bind(self), false);
+				}
 
 				// ----------------------------------------------------------------
 
@@ -792,7 +805,7 @@
 						&& e instanceof Event == false
 						&& e instanceof $.Event == false
 					){
-						e = new $.Event(eventName);
+						e = $.Event(eventName);
 					}
 
 					var events = this.events[eventName];
@@ -864,69 +877,96 @@
 
 
 			/**
+			 * @description global elements
+			 * @memberof MSelectDBox
+			 * */
+			"_globalElems": {
+				"fade": void 0
+			},
+
+
+			/**
 			 * @description Global styles by selectors
 			 * @memberof MSelectDBox
 			 * */
 			"_globalStyles": {
-				".MSelectDBox": {
+				".m-select-d-box": {
 					position: "absolute", display: "block", width: "168px", padding: '8px', height: "auto", "box-shadow": "0 0px 8px rgba(0, 0, 0, 0.24)", "background-color": "#FFF", "border-radius": "3px"
 				},
-				".MSelectDBox_hidden": {
-					display: "none"
-				},
-				".MSelectDBox:after": {
+				".m-select-d-box:after": {
 					content:'\'\'', position: "absolute", "border-left": "10px solid transparent", "border-right": "9px solid transparent", "border-bottom": "10px solid white", top: "-10px", left: "50%", "margin-left": "-10px"
 				},
-				".MSelectDBox_bottom:after": {
-					content:'\'\'', position: "absolute", "border-left": "10px solid transparent", "border-right": "9px solid transparent", "border-bottom": "none", "border-top": "10px solid white", top: "initial", bottom: "-10px", left: "50%", "margin-left": "-10px",
+				".m-select-d-box_bottom:after": {
+					content:'\'\'', position: "absolute", "border-left": "10px solid transparent", "border-right": "9px solid transparent", "border-bottom": "none", "border-top": "10px solid white", top: "initial", bottom: "-10px", left: "50%", "margin-left": "-10px"
 				},
-				".MSelectDBox__list-container": {
+				".m-select-d-box__list-container": {
 					position: "relative", margin: "0px", padding: "0px", "max-height": "200px", "overflow-x": "hidden"
 				},
-				".MSelectDBox__list-item": {
+				".m-select-d-box__list-item": {
 					position: "relative", padding: "5px", "background-color": "initial", color: "black", display: "block", "line-height": "100%", cursor: "pointer", "font-size": "12px"
 				},
-				".MSelectDBox__list-item:hover, .MSelectDBox__list-item_hover": {
+				".m-select-d-box__list-item:hover, .m-select-d-box__list-item_hover": {
 					"background-color": "#e6e6e6"
 				},
-				".MSelectDBox__list-item_selected": {
+				".m-select-d-box__list-item_selected": {
 					"background-color": "#C40056", color:"white"
 				},
-				".MSelectDBox__list-item_selected:hover, .MSelectDBox__list-item_selected.MSelectDBox__list-item_hover": {
+				".m-select-d-box__list-item_selected:hover, .m-select-d-box__list-item_selected.m-select-d-box__list-item_hover": {
 					"background-color": "#DB2277"
 				},
-				".MSelectDBox__list-item_selected:before": {
+				".m-select-d-box__list-item_selected:before": {
 					content:'\':: \''
 				},
-				".MSelectDBox__list-item:active, .MSelectDBox__list-item_selected:active": {
+				".m-select-d-box__list-item:active, .m-select-d-box__list-item_selected:active": {
 					"background-color": "#b80000", color: "white"
 				},
-				".MSelectDBox__list-item_hidden": {
+				".m-select-d-box__list-item_hidden": {
 					display:"none"
 				},
-				".MSelectDBox__search-input": {
+				".m-select-d-box__search-input": {
 					border: "1px solid #a2a2a2", width: "100%", "line-height": "1em", "font-size": "1em", "border-width": "0 0 2px 0", "padding": "1em", "box-sizing": "border-box"
 				},
-				".MSelectDBox__search-input-container": {
+				".m-select-d-box__search-input-container": {
 					"margin-bottom": "12px", display: "none"
 				},
+				".m-select-d-box__search-input-container_active": {
+					display: "block"
+				},
+				".m-select-d-box-fade": {
+					display: "none", width: 0, height: 0, left: 0, top: 0
+				},
 				"@media screen and (max-width: 640px)": {
-					".MSelectDBox": {
+					".m-select-d-box": {
 						position: "fixed", width: "80% !important", padding: "0 !important", left: "10% !important", top:"10% !important", "max-height": "80%", "box-shadow": "none", "border-radius": "0px", "box-sizing": "border-box"
 					},
-					".MSelectDBox:after": {
+					".m-select-d-box:after": {
 						content: "initial"
 					},
-					".MSelectDBox__list-container": {
+					".m-select-d-box__list-container": {
 						"max-height": "initial"
 					},
-					".MSelectDBox__list-item": {
+					".m-select-d-box__list-item": {
 						padding: "1em", "font-size": "1em"
 					},
-					".MSelectDBox__search-input-container": {
+					".m-select-d-box__search-input-container": {
 						"margin-bottom": "12px", display: "block"
+					},
+					".m-select-d-box-fade": {
+						width: "100%", height: "100%", position: "fixed", left: 0, top: 0, "background-color": "rgba(0, 0, 0, 0.33)", display: "block"
 					}
+				},
+				"@media screen and (max-width: 740px)": {
+					"@media screen and (min-resolution: 2dppx)": {
+						// Здесь копия max-width 640px
+						// см._buildStyles
+					}
+				},
+
+				// Стоит здесь для высшего приоритета
+				".m-select-d-box_hidden": {
+					display: "none"
 				}
+
 			},
 
 
@@ -935,7 +975,7 @@
 			 * */
 			"_initStyles": function(){
 
-				if (  !$('#mSelectDBoxStyle').length  ){
+				if (  !$('#m-select-d-box-style').length  ){
 					this._buildStyles();
 				}
 
@@ -947,13 +987,19 @@
 			 * */
 			"_buildStyles": function(){
 
+				// Копируется мобильные стили для устройств с высокой плотностью точек
+
+				this._globalStyles["@media screen and (max-width: 740px)"]["@media screen and (min-resolution: 2dppx)"] = this._globalStyles["@media screen and (max-width: 640px)"];
+
+				// ------------------------------------------------------------------------------------------------
+
 				var body = $("body");
 
 				var buildCSS= function(obj){
 					var str = "";
 					for(var styleSelector in obj){
 						if (  !Object.prototype.hasOwnProperty.call(obj, styleSelector)  ) continue;
-						if (  styleSelector.match("^@media")  ){
+						if (  styleSelector.match(/^@media/)  ){
 							str += styleSelector + " {" + buildCSS(obj[styleSelector]) + "} ";
 							continue;
 						}
@@ -969,11 +1015,11 @@
 
 				var css = buildCSS(this._globalStyles);
 
-				var styleElem = $('#mSelectDBoxStyle');
+				var styleElem = $('#m-select-d-box-style');
 
 				if (  !styleElem.length  ){
 					styleElem = $('<style />');
-					styleElem.attr("id", "mSelectDBoxStyle");
+					styleElem.attr("id", "m-select-d-box-style");
 					body.append(styleElem);
 				}
 
@@ -1092,26 +1138,40 @@
 
 				var body = $("body").get(0);
 
+				// --------------------------------------------------------------
+				// "Фоновая тьма" для моб. устройств
+
+				if (  this._isColdInit()  ) {
+					this._globalElems.fade = document.createElement("div");
+					this._globalElems.fade.className = 'm-select-d-box-fade m-select-d-box_hidden';
+					body.appendChild(this._globalElems.fade);
+				}
+
+
+				// --------------------------------------------------------------
+				// Диалоговое окно
+
 				var dbox = document.createElement('div');
-				var jqDBox = $(dbox);
+				// var jqDBox = $(dbox);
 
 				this.set("dbox", dbox);
 
-				jqDBox.addClass("MSelectDBox");
-				jqDBox.addClass("MSelectDBox_hidden");
+				dbox.className = "m-select-d-box m-select-d-box_hidden";
+				// jqDBox.addClass("m-select-d-box");
+				// jqDBox.addClass("m-select-d-box_hidden");
 
 				var searchInputContainer = $(
-					'<div class="MSelectDBox__search-input-container">' +
-					'<input class="MSelectDBox__search-input" placeholder="Search " type="text">' +
+					'<div class="m-select-d-box__search-input-container">' +
+					'<input class="m-select-d-box__search-input" placeholder="Search " type="text">' +
 					'</div>'
 				).get(0);
 
-				// var searchInput = $("input",searchInputContainer).get(0);
+				this.set("dbox_input", $("input",searchInputContainer).get(0));
 
 				dbox.appendChild(searchInputContainer);
 
 				if (  !this.get("builtInInput")  ){
-					// searchInputContainer.style.display = "none";
+					searchInputContainer.className += "m-select-d-box__search-input-container_active";
 				}
 
 				this.set("dbox", dbox);
@@ -1124,7 +1184,6 @@
 				var width = this.get("width");
 
 				if (width == "auto"){
-
 					dbox.style.width = this.get("target").clientWidth + "px";
 
 				} else if (width == "min") {
@@ -1191,7 +1250,7 @@
 
 				var ul = document.createElement('ul');
 
-				ul.className = "MSelectDBox__list-container";
+				ul.className = "m-select-d-box__list-container";
 
 				var self = this;
 
@@ -1200,7 +1259,7 @@
 
 					var li = document.createElement("li");
 
-					li.className = "MSelectDBox__list-item";
+					li.className = "m-select-d-box__list-item";
 
 					li.setAttribute('data-msdbid',itemKey);
 
@@ -1242,8 +1301,8 @@
 					// addEventListener || attachEvent
 					$(li).bind("mouseleave",function(){
 						var jqThis = $(this);
-						if (  jqThis.hasClass("MSelectDBox__list-item_hover")  ){
-							jqThis.removeClass("MSelectDBox__list-item_hover");
+						if (  jqThis.hasClass("m-select-d-box__list-item_hover")  ){
+							jqThis.removeClass("m-select-d-box__list-item_hover");
 						}
 					},null);
 
@@ -1267,8 +1326,6 @@
 
 				var body = $('body').get(0);
 
-				this.instances.push(this);
-
 				// --------------------------------------------------------------------------------
 				/*
 				* "this._initEvents" внутри использует ссылку на target.
@@ -1280,7 +1337,6 @@
 
 				this.events = Object.create(null);
 
-				this._coldInit = 1;
 				this._initProps(arg);
 				this._initTarget();
 				this._initEvents(arg);
@@ -1355,7 +1411,7 @@
 
 				// --------------------------------------------------------------
 
-				if (self.instances.length < 2){
+				if (  self._isColdInit()  ){
 					$(body).bind(
 						"click",
 						function(e){
@@ -1363,6 +1419,11 @@
 						}, null
 					);
 				}
+
+				// --------------------------------------------------------------
+				// instances размещен в конце для правильной работы this._isColdInit()
+
+				this.instances.push(this);
 
 			},
 
@@ -1382,15 +1443,15 @@
 				var thisHeight = target.clientHeight;
 				var dboxWidth = dbox.clientWidth;
 
-				jqDBox.removeClass("MSelectDBox_bottom");
+				jqDBox.removeClass("m-select-d-box_bottom");
 
-				dbox.style.left = (offset.left + (thisWidth / 2) - ((dboxWidth + (self._globalStyles[".MSelectDBox"].padding.replace(/[px]/gi,"") * 2)) / 2)) + "px";
+				dbox.style.left = (offset.left + (thisWidth / 2) - ((dboxWidth + (self._globalStyles[".m-select-d-box"].padding.replace(/[px]/gi,"") * 2)) / 2)) + "px";
 
 				var scrollY = window.scrollY || body.scrollTop;
 
 				if ( (dbox.clientHeight + offset.top + thisHeight + 12 - scrollY) > window.innerHeight){
 					dbox.style.top = (offset.top - 12 - dbox.clientHeight) + "px";
-					jqDBox.addClass("MSelectDBox_bottom");
+					jqDBox.addClass("m-select-d-box_bottom");
 				} else {
 					dbox.style.top = (offset.top + thisHeight + 12) + "px";
 				}
@@ -1405,13 +1466,13 @@
 				var selectedLi;
 				var dbox = this.get("dbox");
 
-				var ul = $(".MSelectDBox__list-container",dbox).get(0);
+				var ul = $(".m-select-d-box__list-container",dbox).get(0);
 
 				if (  !this.get("multiple")  ){
-					selectedLi = $(".MSelectDBox__list-item_selected",dbox);
+					selectedLi = $(".m-select-d-box__list-item_selected",dbox);
 
 				} else {
-					selectedLi = $(".MSelectDBox__list-item_hover",dbox);
+					selectedLi = $(".m-select-d-box__list-item_hover",dbox);
 
 				}
 
@@ -1426,6 +1487,27 @@
 
 				ul.scrollTop = top - ul.clientHeight / 2;
 
+			},
+
+
+			/**
+			 * Пересчитывает высоту для контейнера списка.
+			 * Важно для мобильных устройств,
+			 * где стили устанавливают макс-высоту ".m-select-d-box" относительно всего окна (80%)
+			 * => как следствие контейнер списка ".m-select-d-box__list-container" не может иметь высоту 100% (ведь высота устанавливается автоматически)
+			 * и сам при этом не может растягивать высоту родительского контента
+			 * Для этого необходимо чтобы кто-то имел высоту.
+			 * Решение: высоту получает ".m-select-d-box__list-container" он же растягивает родитель у которого height: auto и max-height: 80%
+			 * @ignore
+			 * */
+			"_calcListContainerHeight": function(){
+				var listContainer = $(this.get("dbox")).find(".m-select-d-box__list-container").get(0);
+				if (  this._isMobileState()  ){
+					var vh = window.innerHeight / 100;
+					listContainer.style.height = ((vh * 80) - 64) + "px";
+					return;
+				}
+				if (  listContainer.style.height  ) listContainer.style.height = "";
 			},
 
 
@@ -1467,6 +1549,27 @@
 				}
 
 				return false;
+			},
+
+
+			/**
+			 * return true если соблюдены условия для показа мобильной версии
+			 * @return {Boolean}
+			 * @ignore
+			 * */
+			"_isMobileState": function(){
+				return (
+					window.innerWidth <= 640
+					|| (
+						window.innerWidth <= 740
+						&& this.fx.isHDensScreen()
+					)
+				);
+			},
+
+
+			"_isColdInit": function(){
+				return !this.instances.length;
 			},
 
 
@@ -1579,7 +1682,7 @@
 
 				var li = $("li",dbox);
 
-				li.removeClass("MSelectDBox__list-item_selected");
+				li.removeClass("m-select-d-box__list-item_selected");
 
 				for(var c= 0, L=li.length; c<L; c++){
 					var msdbid = li[c].getAttribute("data-msdbid");
@@ -1587,7 +1690,7 @@
 						typeof list[msdbid] != "undefined"
 						&& list[msdbid].selected
 					){
-						$(li[c]).addClass('MSelectDBox__list-item_selected');
+						$(li[c]).addClass('m-select-d-box__list-item_selected');
 					}
 				}
 			},
@@ -1632,6 +1735,8 @@
 			 * @param {Object} arg
 			 * @param {String | Array} arg.value - select by value
 			 * @param {String | Array} arg.label - select by label
+			 * @param {Number} arg.id - select by id
+			 * @param {Boolean} arg.blank
 			 * @memberof MSelectDBox
 			 * */
 			"select" : function(arg){
@@ -1730,8 +1835,6 @@
 			 * */
 			"_deselectByID": function(arg){
 				var c;
-
-				if (typeof bool == "undefined") bool = true;
 
 				if (  !isNaN(arg)  ){
 					arg = [parseInt(arg)];
@@ -1874,7 +1977,7 @@
 			 * */
 			"isActive": function(){
 				var dbox = this.get("dbox");
-				return $(dbox).hasClass("MSelectDBox_hidden") == false
+				return $(dbox).hasClass("m-select-d-box_hidden") == false
 			},
 
 
@@ -1895,7 +1998,8 @@
 			 * */
 			"close" : function(){
 				var dbox = this.get("dbox");
-				$(dbox).addClass("MSelectDBox_hidden");
+				$(dbox).addClass("m-select-d-box_hidden");
+				this._closeFade();
 			},
 
 
@@ -1905,8 +2009,26 @@
 			 * */
 			"open" : function(){
 				var dbox = this.get("dbox");
-				$(dbox).removeClass("MSelectDBox_hidden");
+				$(dbox).removeClass("m-select-d-box_hidden");
 				this.calcPosition();
+				this._openFade();
+				// if (  this._isMobileState()  ) this.get("dbox_input").focus();
+			},
+
+
+			/**
+			 * @ignore
+			 * */
+			"_openFade": function(){
+				$(this._globalElems.fade).removeClass("m-select-d-box_hidden");
+			},
+
+
+			/**
+			 * @ignore
+			 * */
+			"_closeFade": function(){
+				$(this._globalElems.fade).addClass("m-select-d-box_hidden");
 			},
 
 
@@ -1914,6 +2036,39 @@
 			 * @ignore
 			 * */
 			"fx" : {
+				"isHDensScreen": function(){
+					// http://stackoverflow.com/questions/19689715/what-is-the-best-way-to-detect-retina-support-on-a-device-using-javascript
+					return (
+						(
+							window.matchMedia
+							&& (
+								window.matchMedia('only screen and (min-resolution: 124dpi), only screen and (min-resolution: 1.3dppx), only screen and (min-resolution: 48.8dpcm)').matches
+								|| window.matchMedia('only screen and (-webkit-min-device-pixel-ratio: 1.3), only screen and (-o-min-device-pixel-ratio: 2.6/2), only screen and (min--moz-device-pixel-ratio: 1.3), only screen and (min-device-pixel-ratio: 1.3)').matches
+							)
+						)
+						|| (
+							window.devicePixelRatio
+							&& window.devicePixelRatio > 1.3
+						)
+					) || false
+				},
+
+				"isRetinaScreen": function(){
+					return (
+						(
+							window.matchMedia
+							&& (
+								window.matchMedia('only screen and (min-resolution: 192dpi), only screen and (min-resolution: 2dppx), only screen and (min-resolution: 75.6dpcm)').matches
+								|| window.matchMedia('only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (-o-min-device-pixel-ratio: 2/1), only screen and (min--moz-device-pixel-ratio: 2), only screen and (min-device-pixel-ratio: 2)').matches
+							)
+						)
+						|| (
+							window.devicePixelRatio
+							&& window.devicePixelRatio >= 2
+						)
+					) || false
+				},
+
 				"msplit" : function(d,s){
 					s = s.replace(new RegExp('['+d.join('')+']','g'),d[0]);
 					return s.split(d[0]);
