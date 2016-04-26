@@ -20,6 +20,29 @@
 				width:100%;
 			}
 
+			.form-table_sep {
+				border-collapse: collapse;
+			}
+
+			.form-table_sep td {
+				border-bottom: 1px dotted #B0B0B0;
+				padding: 24px 0;
+			}
+
+			.form-table_sep tr:last-child td {
+				border-bottom: none;
+			}
+
+			.form-table_sep td:first-child {
+				padding-right: 24px;
+			}
+
+			.note {
+				color: #555;
+				margin-top: 12px;
+				font-style: italic;
+			}
+
 			.std-plate {
 				padding: 12px;
 				background-color:white;
@@ -109,8 +132,9 @@
 				$("#msdb-a").mSelectDBox({
 					"list": (function(){
 						var arr = [];
-						for(var c=0; c<220; c++){
-							arr.push(Math.round(Math.random() * 1000000));
+						var counter = 0;
+						for(var c=0; c<100; c++){
+							arr.push(counter += Math.round(Math.random() * 99) * 10);
 						}
 						return arr;
 					})(),
@@ -122,18 +146,13 @@
 				});
 
 				$("#msdb-b").mSelectDBox({
-					"list": (function(){
-						var lib = "qwertyuiopasdfghjklzxcvbnm".split("");
-						var arr = [], str;
-						for(var c=0; c<12; c++){
-							str = "";
-							for(var v=0; v<8; v++){
-								str += lib[Math.rand(0, lib.length-1)];
-							}
-							arr.push(str);
-						}
-						return arr;
-					})(),
+					"list": [
+						"alpha", "beta", "gamma", "delta",
+						"epsilon", "zeta", "eta", "theta", "iota",
+						"kappa", "lambda", "mu", "nu", "xi",
+						"omicron", "pi", "rho", "sigma", "tau",
+						"upsilon", "phi", "chi", "psi", "omega"
+					],
 					"builtInInput": 0,
 					"multiple": true,
 					"autoComplete": true,
@@ -177,7 +196,8 @@
 						"Cherdyntsev"
 					],
 					"multiple": 1,
-					"name": "d"
+					"name": "d",
+					"autoComplete": true
 				});
 
 				var customFilterMatchLeft = function(inputString, optionString){
@@ -198,6 +218,23 @@
 					"autoComplete": true
 				});
 
+				$("#msdb-f").mSelectDBox({
+					"list": [
+						"Petrenko (muhomor)",
+						"Larin",
+						"Abdulova",
+						"Dukalis",
+						"Kazantsev",
+						"Volkov",
+						"Solovets",
+						"Cherdyntsev"
+					],
+					"multiple": 1,
+					"name": "f",
+					"autoComplete": true,
+					"embeddedInput": true
+				});
+
 			});
 		</script>
 	</head>
@@ -208,39 +245,56 @@
 	-->
 
 	<div class="std-plate std-plate_thick-pad std-plate_rounded" style="display:inline-block;">
-		<table class="form-table" style="width:420px;">
+		<table class="form-table form-table_sep" style="width:420px;">
+
 			<tr>
-				<td style="width:256px;">multiple = false, autoComplete = true: </td>
+				<td style="width:256px;">multiple = false,<br />autoComplete = true</td>
 				<td>
 					<label>
 						<input id="msdb-a" class="std-input" type="text">
 					</label>
 				</td>
 			</tr>
+
 			<tr>
-				<td>multiple = true, autoComplete = true: </td>
+				<td>multiple = true,<br />autoComplete = true</td>
 				<td>
 					<label>
 						<input id="msdb-b" class="std-input" type="text">
 					</label>
 				</td>
 			</tr>
+
 			<tr>
-				<td>multiple = true, autoComplete = true, optionFilters=[default, russianKeyboard]: </td>
+				<td>
+					<div>
+						multiple = true,<br />autoComplete = true,<br />optionFilters=[default, russianKeyboard]
+					</div>
+					<div class="note">
+						Searches Cyrillic text correcting the Latin keyboard layout
+					</div>
+				</td>
 				<td>
 					<label>
 						<input id="msdb-c" class="std-input" type="text">
 					</label>
 				</td>
 			</tr>
+
 			<tr>
-				<td>multiple = false, autoComplete = true, optionFilters=[matchLeft]: </td>
+				<td>
+					<div>multiple = false,<br />autoComplete = true,<br />optionFilters=[matchLeft]</div>
+					<div class="note">
+						Select only those items that match the beginning of the line
+					</div>
+				</td>
 				<td>
 					<label>
 						<input id="msdb-e" class="std-input" type="text">
 					</label>
 				</td>
 			</tr>
+
 			<tr>
 				<td>multiple = true</td>
 				<td>
@@ -249,6 +303,16 @@
 					</label>
 				</td>
 			</tr>
+
+			<tr>
+				<td>multiple = true,<br />embeddedInput = true</td>
+				<td>
+					<label>
+						<input type="button" id="msdb-f" class="std-button" value="Select options">
+					</label>
+				</td>
+			</tr>
+
 		</table>
 	</div>
 	<br />

@@ -2,7 +2,6 @@
 *.rar
 *.7z
 .idea
-/js/MSelectDBox - Copy.js
 /js/showdown.min.js
 /test
 /out

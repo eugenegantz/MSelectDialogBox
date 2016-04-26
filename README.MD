@@ -7,6 +7,7 @@ Features
 - Autocomplete
 - Custom function of autocomplete filter. Example: correction of keyboard language layout
 - Could be attached to any target element
+- Adapted for portable devices
 
 ###[Demo](http://eugenegantz.ru/demo/MSelectDBox/example.html)###
 
@@ -77,6 +78,8 @@ Default: undefined
 
 * [Array] `optionFilters` - autocomplete filters.
 Default: `[$.prototype.mSelectDBox.prototype.defaultOptionFilters.default]`
+
+* [Boolean] `embeddedInput` - activates search input inside listbox
 
 Events
 ----------------------------------

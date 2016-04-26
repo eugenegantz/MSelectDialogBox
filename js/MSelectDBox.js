@@ -211,30 +211,26 @@
 			},
 
 
-			"_targetEvents": [
-				{"name": "click", "event": "click"},
-				{"name": "keydown", "event": "keydown"},
-				{"name": "keyup", "event": "keyup"},
-				{"name": "hover", "event": "hover"},
-				{"name": "focus", "event": "focus"},
-				{"name": "focusout", "event": "focusout"},
-				{"name": "change", "event": "change"}
-			],
+			"_targetEvents": {
+				"click": {"name": "click", "event": "click"},
+				"keydown": {"name": "keydown", "event": "keydown", "dbox_input": true},
+				"keyup": {"name": "keyup", "event": "keyup", "dbox_input": true},
+				"hover": {"name": "hover", "event": "hover"},
+				"focus": {"name": "focus", "event": "focus"},
+				"focusout": {"name": "focusout", "event": "focusout"},
+				"change": {"name": "change", "event": "change"}
+			},
 
 
 			/**
 			 * @ignore
 			 * */
 			"_eventCheckInputEmpty": function(e){
-				var target = this.get("target");
-				var list = this.get("list");
-
+				// var target = this.get("target");
+				// var list = this.get("list");
 				if (
-					(
-						$.inArray(target.tagName.toLowerCase(), ["input","textarea"]) != -1
-					|| $.inArray(target.type.toLowerCase(), ["text", "password", "email", "url", "search", "tel"]) != -1
-					)
-					&& !target.value.trim()
+					this.fx.isTextInput(e.target)
+					&& !e.target.value.trim()
 				) {
 					this.trigger("input:empty", e);
 				}
@@ -295,10 +291,23 @@
 
 				var self						= this;
 				var target					= self.get("target");
+				var dboxInput			= self.get("dbox_input");
 				var keyCode				= e.keyCode;
 				var list						= self.get("list");
 				var dbox						= self.get("dbox");
 				var contextElement		= e.currentTarget;
+
+				// Трансфер строки из target в dbox_input и наоборот
+				// ------------------------------------------------------------------------------------
+				if (  self._isDBoxInput(e.target)  ){
+					if (  self.fx.isTextInput(target)  ) {
+						target.value = dboxInput.value;
+					}
+				} else if (contextElement == target) {
+					dboxInput.value = target.value;
+				}
+
+				// ------------------------------------------------------------------------------------
 
 				clearTimeout(self._timers.autoComplete);
 
@@ -313,7 +322,7 @@
 						} else {
 
 							var li	= $(".m-select-d-box__list-item", dbox);
-							value	= target.value.toLowerCase();
+							value	= contextElement.value.toLowerCase();
 							// value	= self.fx.trim(value,";, ","both");
 							value	= self.fx.msplit([';',','],value);
 							value = value[value.length-1];
@@ -338,6 +347,10 @@
 								}
 
 								jqLi.removeClass('m-select-d-box__list-item_hover');
+							}
+
+							if (  !self._isMobileState()  ){
+								self.calcPosition();
 							}
 						}
 
@@ -381,7 +394,6 @@
 				var ul, li, c, L;
 
 				var dbox = self.get("dbox");
-				var list = self.get("list");
 				var target = self.get("target");
 
 				// Если список без множественного выделения
@@ -457,9 +469,7 @@
 			"_eventDefaultKeyDownMultipleTrue": function(e){
 
 				var self = this, c, L;
-				var target = self.get("target");
 				var dbox = self.get("dbox");
-				var list = self.get("list");
 				var selectedKey;
 
 				if (  self.get("multiple")  ){
@@ -546,15 +556,9 @@
 
 				self.open();
 
-				var contextElement = (  e.currentTarget || (this instanceof Element ? this : null )  );
+				var contextElement = e.currentTarget || (this instanceof Element ? this : null);
 
-				if (
-					$.inArray(contextElement.tagName.toLowerCase(), ["input","textarea"]) != -1
-					|| (
-					contextElement.type
-					&& $.inArray(contextElement.type.toLowerCase(), ["text", "password", "email", "url", "search", "tel"]) != -1
-					)
-				){
+				if (  self.fx.isTextInput(contextElement)  ){
 					msdb_value = contextElement.getAttribute('data-msdb-value');
 					if ( msdb_value ) msdb_value = msdb_value.trim();
 
@@ -608,9 +612,6 @@
 				if (  !self.get("freeWrite")  ){
 					self.applySelectedToInput();
 				}
-
-				// Записать value внутри инпута
-				self.applySelectedToInput();
 
 				// Отметить выбранные строки
 				self.applySelectedToList();
@@ -692,6 +693,7 @@
 				this.on(
 					"focusout",
 					function(context, e){
+						// Хак для FireFox. В нем нет relatedTarget для focusout
 						if (  !e.relatedTarget  ) {
 							self._timers.focusoutInputs = setTimeout(
 								function(){
@@ -699,6 +701,10 @@
 								},
 								250
 							);
+							return;
+						}
+
+						if (  self._isDBoxInput(e.relatedTarget)  ){
 							return;
 						}
 
@@ -712,6 +718,12 @@
 						self.close();
 					}
 				);
+
+				// Отменяет таймаут для FF relatedTarget хака
+				// Поскольку является частью блока-списка
+				$(this.get("dbox_input")).bind("focus", function(){
+					clearTimeout(self._timers.focusoutInputs);
+				});
 
 				this.on("set",this._eventDefaultSet);
 				this.on("get", this._eventDefaultGet);
@@ -789,8 +801,6 @@
 			 * */
 			"trigger": function(eventName, e){
 
-				var self = this;
-
 				if (typeof eventName != "string") return;
 
 				eventName = eventName.toLowerCase();
@@ -814,7 +824,7 @@
 
 						if (typeof events[c] != "function") continue;
 
-						events[c].apply(this,[self, e]);
+						events[c].apply(this,[this, e]);
 
 					}
 
@@ -832,8 +842,9 @@
 			 * @memberof MSelectDBox
 			 * */
 			"on": function(eventName, fx){
-				var c, self = this;
+				var self = this;
 				var target = this.get("target");
+				var dboxInput = this.get("dbox_input");
 
 				if (
 					typeof eventName != "string"
@@ -851,20 +862,25 @@
 
 					this.events[eventName] = [];
 
-					for(c=0; c<this._targetEvents.length; c++){
+					if (  this._targetEvents.hasOwnProperty(eventName)  ){
+						$(target).bind(
+							this._targetEvents[eventName].event,
+							function(e){
+								self.trigger(eventName, e);
+							},
+							null
+						);
 
-						if (  this._targetEvents[c].name.toLowerCase() == eventName  ){
-							// addEventListener || attachEvent
-							$(target).bind(
-								this._targetEvents[c].event,
+						// Событие для встроенного элемента-ввода
+						if (  this._targetEvents[eventName].dbox_input  ){
+							$(dboxInput).bind(
+								this._targetEvents[eventName].event,
 								function(e){
 									self.trigger(eventName, e);
 								},
 								null
 							);
-							break;
 						}
-
 					}
 
 				}
@@ -924,7 +940,7 @@
 					display:"none"
 				},
 				".m-select-d-box__search-input": {
-					border: "1px solid #a2a2a2", width: "100%", "line-height": "1em", "font-size": "1em", "border-width": "0 0 2px 0", "padding": "1em", "box-sizing": "border-box"
+					border: "1px solid #a2a2a2", width: "100%", "line-height": "100%", "font-size": "14px", "border-width": "0 0 2px 0", "padding": "8px", "box-sizing": "border-box"
 				},
 				".m-select-d-box__search-input-container": {
 					"margin-bottom": "12px", display: "none"
@@ -950,6 +966,9 @@
 					},
 					".m-select-d-box__search-input-container": {
 						"margin-bottom": "12px", display: "block"
+					},
+					".m-select-d-box__search-input": {
+						"line-height": "1em", "font-size": "1em", "padding": "1em"
 					},
 					".m-select-d-box-fade": {
 						width: "100%", height: "100%", position: "fixed", left: 0, top: 0, "background-color": "rgba(0, 0, 0, 0.33)", display: "block"
@@ -1046,7 +1065,7 @@
 					{"key":"multiple", "type":"any","into":"boolean"},
 					{"key":"zIndex", "type":"numeric", "into":"integer"},
 					{"key":"width","type":"any"},
-					{"key":"builtInInput", "type":"any", "into": "boolean"},
+					{"key":"embeddedInput", "type":"any", "into": "boolean"},
 					{"key":"optionFilters", "type":"array"},
 					{"key":"freeWrite", "type":"any", "into": "boolean"}
 				];
@@ -1170,8 +1189,8 @@
 
 				dbox.appendChild(searchInputContainer);
 
-				if (  !this.get("builtInInput")  ){
-					searchInputContainer.className += "m-select-d-box__search-input-container_active";
+				if (  Boolean(this.get("embeddedInput"))  ){
+					searchInputContainer.className += " m-select-d-box__search-input-container_active";
 				}
 
 				this.set("dbox", dbox);
@@ -1339,8 +1358,8 @@
 
 				this._initProps(arg);
 				this._initTarget();
-				this._initEvents(arg);
 				this._initElements();
+				this._initEvents(arg);
 				this._initList();
 				this._initStyles();
 
@@ -1372,32 +1391,21 @@
 				self.on(
 					"keydown",
 					function(context, e){
-						var dbox = self.get("dbox");
-						var list = self.get("list");
-
 						self._eventDefaultKeyDownMultipleFalse(e);
 						self._eventDefaultKeyDownMultipleTrue(e);
 					}
 				);
 
+				self.on(
+					"keyup",
+					function(context, e){
+						self._eventDefaultKeyUp(e);
+					}
+				);
+
 				// ------------------------------------------------------------
 
-				if (
-					$.inArray(target.tagName.toLowerCase(), ["input","textarea"]) != -1
-					|| (
-						target.type
-						&& $.inArray(target.type.toLowerCase(), ["text", "password", "email", "url", "search", "tel"]) != -1
-					)
-				){
 
-					self.on(
-						"keyup",
-						function(context, e){
-							self._eventDefaultKeyUp(e);
-						}
-					);
-
-				}
 
 				// --------------------------------------------------------------
 				// Инициализация матчеров строк
@@ -1435,8 +1443,8 @@
 			"calcPosition" : function(){
 				var self = this;
 				var body = $("body").get(0);
-				var target = this.get("target");
-				var dbox = this.get("dbox");
+				var target = this.get("target", null, null);
+				var dbox = this.get("dbox", null, null);
 				var jqDBox = $(dbox);
 				var offset = $(target).offset();
 				var thisWidth = target.clientWidth;
@@ -1449,6 +1457,7 @@
 
 				var scrollY = window.scrollY || body.scrollTop;
 
+				// TODO _isBoxBottomState()
 				if ( (dbox.clientHeight + offset.top + thisHeight + 12 - scrollY) > window.innerHeight){
 					dbox.style.top = (offset.top - 12 - dbox.clientHeight) + "px";
 					jqDBox.addClass("m-select-d-box_bottom");
@@ -1515,7 +1524,7 @@
 			 * @ignore
 			 * */
 			"_isDBoxElement": function(element){
-				var dbox = this.get("dbox");
+				var dbox = this.get("dbox", null, null);
 				// var each = $("*", dbox).toArray();
 				var each = $(dbox).find("*");
 				if (each){
@@ -1534,21 +1543,29 @@
 			 * @ignore
 			 * */
 			"_isTargetElement": function(element){
-				var target = this.get("target");
+				var target = this.get("target", null, null);
 				// var each = $("*",target).toArray();
 				var each = $(target).find("*");
 				if (each){
 					each = Array.prototype.slice.call(each,0);
 					each.push(target);
+					// На случай если target не просто <input> а сложный элемент
 					for(var c=0; c<each.length; c++){
 						if (each[c] == element){
 							return true;
 						}
 					}
-
 				}
 
 				return false;
+			},
+
+
+			/**
+			 * @ignore
+			 * */
+			"_isDBoxInput": function(elem){
+				return this.get("dbox_input") === elem;
 			},
 
 
@@ -1565,6 +1582,16 @@
 						&& this.fx.isHDensScreen()
 					)
 				);
+			},
+
+
+			/**
+			 * Определить нужно ли инвертировать положение бокса по вертикали
+			 * @ignore
+			 * */
+			"_isBoxBottomState": function(){
+				var dbox = this.get("dbox", null, null);
+				return Boolean(dbox.className.match(new RegExp("m-select-d-box_bottom")));
 			},
 
 
@@ -1702,16 +1729,15 @@
 				var listValue	= self.getSelectedValues();
 				var listLabel	= self.getSelectedLabels();
 				var target		= this.get("target");
+				var dboxInput = this.get("dbox_input");
+
+				dboxInput.value =  listLabel.join("; ") + (!listLabel.length || !this.get("multiple") ? "" : ";");
 
 				var tagName = target.tagName.toLowerCase();
+
 				if ( tagName == "input" ){
 
-					if (
-						target.type
-						&& $.inArray(target.type.toLowerCase(), ["text", "password", "email", "url", "search", "tel"]) != -1
-					){
-						target.value = listLabel.join("; ") + (!listLabel.length || !this.get("multiple") ? "" : ";");
-					}
+					if (  self.fx.isTextInput(target)  ) target.value = dboxInput.value;
 
 				} else if ( tagName == "textarea" ) {
 
@@ -1976,14 +2002,14 @@
 			 * @return {Boolean}
 			 * */
 			"isActive": function(){
-				var dbox = this.get("dbox");
+				var dbox = this.get("dbox", null, null);
 				return $(dbox).hasClass("m-select-d-box_hidden") == false
 			},
 
 
 			"reInitList": function(){
 
-				var dbox = this.get("dbox");
+				var dbox = this.get("dbox", null, null);
 
 				$("ul",dbox).detach();
 
@@ -1997,7 +2023,7 @@
 			 * @memberof MSelectDBox
 			 * */
 			"close" : function(){
-				var dbox = this.get("dbox");
+				var dbox = this.get("dbox", null, null);
 				$(dbox).addClass("m-select-d-box_hidden");
 				this._closeFade();
 			},
@@ -2008,11 +2034,11 @@
 			 * @memberof MSelectDBox
 			 * */
 			"open" : function(){
-				var dbox = this.get("dbox");
+				var dbox = this.get("dbox", null, null);
 				$(dbox).removeClass("m-select-d-box_hidden");
 				this.calcPosition();
 				this._openFade();
-				// if (  this._isMobileState()  ) this.get("dbox_input").focus();
+				if (  this._isMobileState()  ) this.get("dbox_input").focus();
 			},
 
 
@@ -2036,6 +2062,23 @@
 			 * @ignore
 			 * */
 			"fx" : {
+				"isTextInput": function(elem){
+					if (elem instanceof Node === false) return false;
+					var tagName = elem.tagName.toLowerCase();
+					if (  tagName == "input"  ){
+						if (
+							elem.type
+							&& $.inArray(elem.type.toLowerCase(), ["text", "password", "email", "url", "search", "tel"]) > -1
+						){
+							return true;
+						}
+
+					} else if (  tagName == "textarea"  ) {
+						return true;
+					}
+					return false;
+				},
+
 				"isHDensScreen": function(){
 					// http://stackoverflow.com/questions/19689715/what-is-the-best-way-to-detect-retina-support-on-a-device-using-javascript
 					return (
