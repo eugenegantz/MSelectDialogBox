@@ -297,6 +297,8 @@
 				var dbox						= self.get("dbox");
 				var contextElement		= e.currentTarget;
 
+				var serviceKeyCodes = [37,38,39,40,9,13,18,17,16,20,27];
+
 				// Трансфер строки из target в dbox_input и наоборот
 				// ------------------------------------------------------------------------------------
 				if (  self._isDBoxInput(e.target)  ){
@@ -304,7 +306,9 @@
 						target.value = dboxInput.value;
 					}
 				} else if (contextElement == target) {
-					dboxInput.value = target.value;
+					if (  serviceKeyCodes.indexOf(e.keyCode) == -1  ){
+						dboxInput.value = target.value;
+					}
 				}
 
 				// ------------------------------------------------------------------------------------
@@ -317,7 +321,8 @@
 					// ... autoComplete
 					if (  self.get("autoComplete")  ){
 
-						if (  $.inArray(keyCode, [37,38,39,40,9,13,18,17,16,20,27]) > -1 ){
+						// left arrow, up arrow, right arrow, down arrow, tab, enter, alt, ctrl, shift, caps lock, escape
+						if (  $.inArray(keyCode, serviceKeyCodes) > -1 ){
 
 						} else {
 
