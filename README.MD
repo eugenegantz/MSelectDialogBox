@@ -9,7 +9,9 @@ Features
 - Could be attached to any target element
 - Adapted for portable devices
 
-###[Demo](http://eugenegantz.ru/demo/MSelectDBox/example.html)###
+####[Demo](https://eugenegantz.github.io/MSelectDialogBox/example.html)####
+####[Download MSelectDialogBox.js](https://raw.githubusercontent.com/eugenegantz/MSelectDialogBox/master/js/MSelectDBox.js)####
+####[Download MSelectDBox.min.js](https://raw.githubusercontent.com/eugenegantz/MSelectDialogBox/master/js/MSelectDBox.min.js)####
 
 Example
 ----------------------------------

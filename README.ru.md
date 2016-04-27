@@ -9,7 +9,9 @@
 - Можно привязать к любому элементу
 - Адаптировано под мобильные устройства
 
-###[Demo](http://eugenegantz.ru/demo/MSelectDBox/example.html)###
+####[Демо](https://eugenegantz.github.io/MSelectDialogBox/example.html)####
+####[Скачать MSelectDialogBox.js](https://raw.githubusercontent.com/eugenegantz/MSelectDialogBox/master/js/MSelectDBox.js)####
+####[Скачать MSelectDBox.min.js](https://raw.githubusercontent.com/eugenegantz/MSelectDialogBox/master/js/MSelectDBox.min.js)####
 
 Пример
 ----------------------------------
