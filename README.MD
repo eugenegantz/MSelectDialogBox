@@ -12,6 +12,7 @@ Features
 ####[Demo](https://eugenegantz.github.io/MSelectDialogBox/example.html)####
 ####[Download MSelectDialogBox.js](https://raw.githubusercontent.com/eugenegantz/MSelectDialogBox/master/js/MSelectDBox.js)####
 ####[Download MSelectDBox.min.js](https://raw.githubusercontent.com/eugenegantz/MSelectDialogBox/master/js/MSelectDBox.min.js)####
+####[Документация на русском](https://github.com/eugenegantz/MSelectDialogBox/blob/master/README.ru.md)####
 
 Example
 ----------------------------------

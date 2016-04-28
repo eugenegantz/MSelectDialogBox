@@ -272,13 +272,14 @@
 
 
 			/**
-			 * При изм. размера окна происходит пересчет размеров внутри видимых списков
+			 * При изм. размера окна происходит пересчет положения и размеров внутри видимых списков
 			 * @ignore
 			 * */
 			"_eventWindowResize": function(){
 				for(var c=0; c<this.instances.length; c++){
 					if (  this.instances[c].isActive()  ){
-						this._calcListContainerHeight();
+						this.instances[c]._calcListContainerHeight();
+						this.instances[c].calcPosition();
 					}
 				}
 			},
@@ -918,13 +919,13 @@
 					content:'\'\'', position: "absolute", "border-left": "10px solid transparent", "border-right": "9px solid transparent", "border-bottom": "10px solid white", top: "-10px", left: "50%", "margin-left": "-10px"
 				},
 				".m-select-d-box_bottom:after": {
-					content:'\'\'', position: "absolute", "border-left": "10px solid transparent", "border-right": "9px solid transparent", "border-bottom": "none", "border-top": "10px solid white", top: "initial", bottom: "-10px", left: "50%", "margin-left": "-10px"
+					content:'\'\'', position: "absolute", "border-left": "10px solid transparent", "border-right": "9px solid transparent", "border-bottom": "none", "border-top": "10px solid white", top: "auto", bottom: "-10px", left: "50%", "margin-left": "-10px"
 				},
 				".m-select-d-box__list-container": {
 					position: "relative", margin: "0px", padding: "0px", "max-height": "200px", "overflow-x": "hidden"
 				},
 				".m-select-d-box__list-item": {
-					position: "relative", padding: "5px", "background-color": "initial", color: "black", display: "block", "line-height": "100%", cursor: "pointer", "font-size": "12px"
+					position: "relative", padding: "5px", "background-color": "none", color: "black", display: "block", "line-height": "100%", cursor: "pointer", "font-size": "12px"
 				},
 				".m-select-d-box__list-item:hover, .m-select-d-box__list-item_hover": {
 					"background-color": "#e6e6e6"
@@ -961,10 +962,10 @@
 						position: "fixed", width: "80% !important", padding: "0 !important", left: "10% !important", top:"10% !important", "max-height": "80%", "box-shadow": "none", "border-radius": "0px", "box-sizing": "border-box"
 					},
 					".m-select-d-box:after": {
-						content: "initial"
+						content: "none"
 					},
 					".m-select-d-box__list-container": {
-						"max-height": "initial"
+						"max-height": "none"
 					},
 					".m-select-d-box__list-item": {
 						padding: "1em", "font-size": "1em"
@@ -1518,10 +1519,10 @@
 				var listContainer = $(this.get("dbox")).find(".m-select-d-box__list-container").get(0);
 				if (  this._isMobileState()  ){
 					var vh = window.innerHeight / 100;
-					listContainer.style.height = ((vh * 80) - 64) + "px";
+					listContainer.style.maxHeight = ((vh * 80) - 64) + "px";
 					return;
 				}
-				if (  listContainer.style.height  ) listContainer.style.height = "";
+				if (  listContainer.style.maxHeight  ) listContainer.style.maxHeight = "";
 			},
 
 
