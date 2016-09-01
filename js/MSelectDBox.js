@@ -898,6 +898,60 @@
 			},
 
 
+			"_detectLanguage": function() {
+				var lang = (navigator.languages || [])[0]
+					|| navigator.language
+					|| navigator.systemLanguage
+					|| navigator.userLanguage
+		 			|| navigator.browserLanguage
+					|| "en-US";
+				return lang.split(/[-_]/ig)[0];
+			},
+
+
+
+
+			"_texts": {
+				".m-select-d-box__search-input": {
+					"ru": "Поиск",
+					"en": "Search"
+				}
+			},
+
+
+			/**
+			 * @description Возвращает текст по указанному ключу в соответствии с настройками языка
+			 * @memberof MSelectDBox
+			 * @param {String} key
+			 * @param {String=} lang - язык выбираемого текста
+			 * @return {String}
+			 * */
+			getText: function(key, lang) {
+				!lang && (lang = this.get("language") || this._detectLanguage());
+
+				return (this._texts[key] || {})[lang] || "";
+			},
+
+
+			/**
+			 * @description Привязать к текст по указанному ключу и языку
+			 * @memberof MSelectDBox
+			 * @param {String} key
+			 * @param {String} lang - язык выбираемого текста
+			 * @param {String} text - текст
+			 * */
+			setText: function(text, key, lang) {
+				var isProto = true;
+				var proto = this instanceof MSelectDBox ? !(isProto = false) && Object.getPrototypeOf(this) : this;
+
+				!proto._texts[key] && (proto._texts[key] = {});
+
+				!lang && (lang = (!isProto && this.get("language")) || this._detectLanguage());
+
+				proto._texts[key][lang] = text;
+			},
+
+
 			/**
 			 * @description global elements
 			 * @memberof MSelectDBox
@@ -912,6 +966,7 @@
 			 * @memberof MSelectDBox
 			 * */
 			"_globalStyles": {
+				// TODO Добавить overflow:hidden для body, чтобы не прокручивалась страница
 				".m-select-d-box": {
 					position: "absolute", display: "block", width: "168px", padding: '8px', height: "auto", "box-shadow": "0 0px 8px rgba(0, 0, 0, 0.24)", "background-color": "#FFF", "border-radius": "3px"
 				},
@@ -1013,7 +1068,7 @@
 			"_buildStyles": function(){
 
 				// Копируется мобильные стили для устройств с высокой плотностью точек
-
+				// TODO Перенести объявление глобальных стилей в анонимную функцию вместе с этим куском кода
 				this._globalStyles["@media screen and (max-width: 740px)"]["@media screen and (min-resolution: 2dppx)"] = this._globalStyles["@media screen and (max-width: 640px)"];
 
 				// ------------------------------------------------------------------------------------------------
@@ -1059,8 +1114,9 @@
 			"_initProps": function(arg){
 
 				// var self = this;
-				var c, v, prop;
+				var c, v, prop, defaultProps = {};
 
+				// TODO Сделать объект с ключами вместо массива
 				var allowedKeys = [
 					{"key":"name", "type": "string"},
 					{"key":"list", "type": "array"},
@@ -1073,12 +1129,19 @@
 					{"key":"width","type":"any"},
 					{"key":"embeddedInput", "type":"any", "into": "boolean"},
 					{"key":"optionFilters", "type":"array"},
+					{"key": "closeButton", "type": "boolean"},
+					{"key": "language", "type": "string", "default": this._detectLanguage()},
 					{"key":"freeWrite", "type":"any", "into": "boolean"}
 				];
 
 				for(c=0; c<allowedKeys.length; c++){
 					allowedKeys[c].key = allowedKeys[c].key.toLowerCase();
+					if (  "default" in allowedKeys[c]  ) {
+						defaultProps[allowedKeys[c].key] = allowedKeys[c].default;
+					}
 				}
+
+				this.set(defaultProps);
 
 				if (typeof arg != "object") return;
 
@@ -1162,13 +1225,16 @@
 			"_initElements": function(){
 
 				var body = $("body").get(0);
+				var lang = this.get("language");
 
 				// --------------------------------------------------------------
 				// "Фоновая тьма" для моб. устройств
 
 				if (  this._isColdInit()  ) {
-					this._globalElems.fade = document.createElement("div");
-					this._globalElems.fade.className = 'm-select-d-box-fade m-select-d-box_hidden';
+					this._globalElems.fade = $(
+						'<div class="m-select-d-box-fade m-select-d-box_hidden">' +
+						'</div>'
+					).get(0);
 					body.appendChild(this._globalElems.fade);
 				}
 
@@ -1187,7 +1253,8 @@
 
 				var searchInputContainer = $(
 					'<div class="m-select-d-box__search-input-container">' +
-					'<input class="m-select-d-box__search-input" placeholder="Search " type="text">' +
+					'<input class="m-select-d-box__search-input" placeholder="' +
+						this.getText(".m-select-d-box__search-input") + '" type="text">' +
 					'</div>'
 				).get(0);
 
@@ -1202,6 +1269,10 @@
 				this.set("dbox", dbox);
 
 				if (  this.get("zIndex")  ) dbox.style.zIndex = this.get("zIndex");
+
+				// --------------------------------------------------------------
+
+				dbox.appendChild($('<ul class="m-select-d-box__list-container"></ul>').get(0));
 
 				// --------------------------------------------------------------
 				// Ширина
@@ -1273,9 +1344,8 @@
 
 				// -------------------------------------------------------------------
 
-				var ul = document.createElement('ul');
-
-				ul.className = "m-select-d-box__list-container";
+				var ul = $(".m-select-d-box__list-container", dbox).get(0);
+				ul.innerHTML = "";
 
 				var self = this;
 
@@ -1334,8 +1404,6 @@
 					li.innerHTML = list[itemKey].label;
 					ul.appendChild(li);
 				}
-
-				dbox.appendChild(ul);
 
 			},
 
@@ -2171,7 +2239,7 @@
 
 		// ---------------------------------------------------------------------------------------------------
 
-		var methodsList = ["open","close","isActive","get","set","select","selectAll","deselectAll","on","trigger", "getSelectedLabels", "getSelectedValues", "getSelectedKeys"];
+		var methodsList = ["open","close","isActive","get","set","select","selectAll","deselectAll","on","trigger", "getSelectedLabels", "getSelectedValues", "getSelectedKeys", "getText", "setText"];
 
 		$.fn.extend({
 			"mSelectDBox":  function(arg){
@@ -2182,6 +2250,7 @@
 				var instance = void 0;
 				var input = this[0];
 
+				// TODO Получать экземпляр непосредственно из DOM элемента
 				for(var c=0; c<instances.length; c++){
 					if (  instances[c].get("target") == input  ){
 						instance = instances[c];

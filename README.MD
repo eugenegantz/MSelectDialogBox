@@ -174,6 +174,40 @@ Filters available by default:
 * `$.prototype.mSelectDBox.prototype.defaultOptionFilters.default` - default autocomplete filter
 * `$.prototype.mSelectDBox.prototype.defaultOptionFilters.russianKeyboard` - correcting layout to russian keyboard
 
+Language support
+----------------------------------
+Language of dropdown list can be assigned through constructor by using key `language`
+
+If language is not specified, the library will try to determine language by user system settings
+
+Predefined language codes:
+* en - English
+* ru - Russian
+
+Example:
+~~~~~ javascript
+$("#selector").mSelectDBox({
+	"list": [1, 2, 3],
+	"language": "en" // English
+});
+~~~~~
+
+To define or redefine a texts for a particular language, you can use the method `setText`
+~~~~~ javascript
+// Initialized instance
+$("#selector").mSelectDBox("setText", "Tap to close", ".m-select-d-box-fade__outside-click-label-text", "en");
+~~~~~
+
+the same to define new language support
+~~~~~ javascript
+// Initialized instance
+$("#selector").mSelectDBox("setText", "kapatmak için dokunun", ".m-select-d-box-fade__outside-click-label-text", "tr"); // Турецкий
+~~~~~
+
+Texts codes:
+* `.m-select-d-box-fade__outside-click-label-text` - "Tap to close"
+* `.m-select-d-box__search-input` - search input
+
 Methods
 ----------------------------------
 ####getInstances####

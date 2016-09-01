@@ -8,6 +8,8 @@
 - Собственные фильтры автопоиска. Например для исправления раскладки с англ. на рус.
 - Можно привязать к любому элементу
 - Адаптировано под мобильные устройства
+- Подписи на двух языках (Английский, Русский).
+Возможность переопределять подписи на встроенных языках и доопределять подписи для других языков.
 
 ####[Демо](https://eugenegantz.github.io/MSelectDialogBox/example.html)####
 ####[Скачать MSelectDialogBox.js](https://raw.githubusercontent.com/eugenegantz/MSelectDialogBox/master/js/MSelectDBox.js)####
@@ -112,6 +114,39 @@ function(inputString, optionString){
 * `$.prototype.mSelectDBox.prototype.defaultOptionFilters.default` - поиск по-умолчанию
 * `$.prototype.mSelectDBox.prototype.defaultOptionFilters.russianKeyboard` - поиск с исправлением раскладки на русскую
 
+Языковая поддержка
+----------------------------------
+Язык выпадающего списка устанавливается в конструкторе ключем `language`
+
+Если язык не указан, библиотека попробует определить язык по настройкам операционной системы.
+
+Предустановленные ключи language:
+* en - Английский
+* ru - Русский
+
+Пример:
+~~~~~ javascript
+$("#selector").mSelectDBox({
+	"list": [1, 2, 3],
+	"language": "en" // Английский
+});
+~~~~~
+
+Чтобы доопределить или переопределить подписи для конкретного языка можно использовать метод `setText`
+~~~~~ javascript
+// Уже инициализированный экземпляр списка
+$("#selector").mSelectDBox("setText", "Tap to close", ".m-select-d-box-fade__outside-click-label-text", "en");
+~~~~~
+
+Тот же способ если необходимо доопределить язык невходящий в комплект
+~~~~~ javascript
+// Уже инициализированный экземпляр списка
+$("#selector").mSelectDBox("setText", "kapatmak için dokunun", ".m-select-d-box-fade__outside-click-label-text", "tr"); // Турецкий
+~~~~~
+
+Коды подписей:
+* `.m-select-d-box-fade__outside-click-label-text` - "Нажмите чтобы закрыть"
+* `.m-select-d-box__search-input` - поле поиска
 
 События
 ----------------------------------
