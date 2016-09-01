@@ -903,15 +903,20 @@
 					|| navigator.language
 					|| navigator.systemLanguage
 					|| navigator.userLanguage
-		 			|| navigator.browserLanguage
+					|| navigator.browserLanguage
 					|| "en-US";
 				return lang.split(/[-_]/ig)[0];
 			},
 
 
+			_lastLang: "",
 
 
 			"_texts": {
+				".m-select-d-box-fade__outside-click-label-text": {
+					"ru": "Нажмите чтобы закрыть",
+					"en": "Tap to close"
+				},
 				".m-select-d-box__search-input": {
 					"ru": "Поиск",
 					"en": "Search"
@@ -1012,9 +1017,22 @@
 				".m-select-d-box-fade": {
 					display: "none", width: 0, height: 0, left: 0, top: 0
 				},
+				".m-select-d-box-fade__outside-click-label": {
+					position: "absolute", width: "100%", bottom: 0, "padding": "10px", background: "black", color: "white", "text-align": "center", "font-size": "1em", "box-sizing": "border-box"
+				},
+				".m-select-d-box-fade__outside-click-label-text": {},
+				".m-select-d-box-fade__outside-click-label-icon": {
+					position: "relative", "border-radius": "50%", "margin-right": "5px", border: "2px solid white", display: "inline-block", height: "16px", width: "16px", "vertical-align": "middle"
+				},
+				".m-select-d-box-fade__outside-click-label-icon:after": {
+					content:'\'\'', position: "absolute", top: "50%", left: "50%", height: "80%", width: "2px", transform: "rotate(45deg)", "margin-left": "-1px", "margin-top": "-40%", background: "white"
+				},
+				".m-select-d-box-fade__outside-click-label-icon:before": {
+					content:'\'\'', position: "absolute", top: "50%", left: "50%", height: "80%", width: "2px", transform: "rotate(-45deg)", "margin-left": "-1px", "margin-top": "-40%", background: "white"
+				},
 				"@media screen and (max-width: 640px)": {
 					".m-select-d-box": {
-						position: "fixed", width: "80% !important", padding: "0 !important", left: "10% !important", top:"10% !important", "max-height": "80%", "box-shadow": "none", "border-radius": "0px", "box-sizing": "border-box"
+						position: "fixed", width: "80% !important", padding: "0 !important", left: "10% !important", top:"5% !important", "max-height": "90%", "box-shadow": "none", "border-radius": "0px", "box-sizing": "border-box"
 					},
 					".m-select-d-box:after": {
 						content: "none"
@@ -1233,6 +1251,12 @@
 				if (  this._isColdInit()  ) {
 					this._globalElems.fade = $(
 						'<div class="m-select-d-box-fade m-select-d-box_hidden">' +
+							'<div class="m-select-d-box-fade__outside-click-label">' +
+								'<div class="m-select-d-box-fade__outside-click-label-icon"></div>' +
+								'<span class="m-select-d-box-fade__outside-click-label-text">' +
+									this.getText(".m-select-d-box-fade__outside-click-label-text") +
+								'<span>' +
+							'</div>' +
 						'</div>'
 					).get(0);
 					body.appendChild(this._globalElems.fade);
@@ -1511,6 +1535,20 @@
 
 
 			/**
+			 * Применяет языковые настройки к глобальным (общим) элементам имеющие подписи
+			 * @param {String} lang - устанавливаемый язык
+			 * */
+			_applyLang: function(lang) {
+				if (this._lastLang == lang) return;
+
+				Object.getPrototypeOf(this)._lastLang = lang;
+
+				$(this._globalElems.fade)
+					.find(".m-select-d-box-fade__outside-click-label-text")
+					.html(this.getText(".m-select-d-box-fade__outside-click-label-text"));
+			},
+
+			/**
 			 * @description Calculate position of list container
 			 * @memberof MSelectDBox
 			 * */
@@ -1587,7 +1625,7 @@
 				var listContainer = $(this.get("dbox")).find(".m-select-d-box__list-container").get(0);
 				if (  this._isMobileState()  ){
 					var vh = window.innerHeight / 100;
-					listContainer.style.maxHeight = ((vh * 80) - 64) + "px";
+					listContainer.style.maxHeight = ((vh * 90) - 64 - 40) + "px";
 					return;
 				}
 				if (  listContainer.style.maxHeight  ) listContainer.style.maxHeight = "";
@@ -2112,6 +2150,7 @@
 				$(dbox).removeClass("m-select-d-box_hidden");
 				this.calcPosition();
 				this._openFade();
+				this._applyLang(this.get("language", null, null));
 				if (  this._isMobileState()  ) this.get("dbox_input").focus();
 			},
 
