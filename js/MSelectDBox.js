@@ -307,7 +307,7 @@
 						target.value = dboxInput.value;
 					}
 				} else if (contextElement == target) {
-					if (  serviceKeyCodes.indexOf(e.keyCode) == -1  ){
+					if (  $.inArray(e.keyCode, serviceKeyCodes) == -1  ){
 						dboxInput.value = target.value;
 					}
 				}
@@ -817,11 +817,17 @@
 				){
 
 					if (
-						e instanceof CustomEvent == false
-						&& e instanceof Event == false
-						&& e instanceof $.Event == false
+						!e
+						|| (
+							e instanceof (window.CustomEvent || new Function()) == false
+							&& e instanceof (window.Event || new Function()) == false
+							&& e instanceof $.Event == false
+						)
 					){
 						e = $.Event(eventName);
+
+					} else if (e instanceof $.Event == false) {
+						e = $.Event(e);
 					}
 
 					var events = this.events[eventName];
