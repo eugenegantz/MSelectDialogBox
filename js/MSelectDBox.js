@@ -2,6 +2,7 @@
 	// ========== Диалогбокс ==========
 
 	(function($){
+		"use strict";
 
 		/**
 		 * @author Eugene Gantz (EG) <EugenGantz@gmail.com>
@@ -30,56 +31,25 @@
 			 * */
 			"_coldInit": 0,
 
-
 			/**
 			 * @param {String} key - key of instance property
-			 * @param {Object=} arg - optional arguments,
+			 * @param {Object=} arg - optional arguments (deprecated),
 			 * @param {Boolean=} e - event trigger on|off. If "false"  then "get" won't trigger event
 			 * @memberof MSelectDBox
 			 * @return {*}
 			 * */
-			"get" : function(key,arg,e){
-
-				var self = this;
+			"get" : function(key, arg, e){
 
 				if (typeof key != "string") return;
 
 				key = key.toLowerCase();
 
-				// .....................
-
-				if (typeof e == "undefined") e = true;
-
-				var eTrigger = function(name){
-					if (e){
-						self.trigger("get", new $.Event(name));
-					}
-				};
-
-				// .....................
-
-				eTrigger("get:"+key);
-
-				var aliases = {};
-
-				var methodAliases = {};
-
-				if ( typeof aliases[key] == "string" ) {
-					key = aliases[key];
+				if (e || e === void 0) {
+					this.trigger("get");
+					this.trigger("get:" + key);
 				}
 
-				if ( typeof methodAliases[key] == "function" ) {
-					key = methodAliases[key];
-					if (typeof this[key] != "function"){
-						return;
-					}
-					if (typeof arg == "undefined") arg = Object.create(null);
-					return this[key](arg);
-				}
-
-				if ( typeof this._props[key] != "undefined" ) {
-					return this._props[key];
-				}
+				return this._props[key];
 
 			},
 
@@ -87,80 +57,50 @@
 			/**
 			 * @param {String} key - key of instance property
 			 * @param {*} value
-			 * @param {Object=} arg - optional arguments,
+			 * @param {Object=} arg - optional arguments (deprecated),
 			 * @param {Boolean=} e - event trigger on|off. If "false"  then "set" won't trigger event
 			 * @memberof MSelectDBox
 			 * @return {Boolean}
 			 * */
-			"set" : function(key,value,arg,e){
+			"set" : function(key, value, arg, e){
 
-				var self = this, tmp;
+				if (!key) return false;
 
-				if (typeof key == "undefined") return false;
+				// ...... множественное присваивание ......
 
-				// Множественное присваивание
-				if ( typeof key == "object" ){
+				if ( typeof key == "object" ) {
 					var return_ = Object.create(null);
+
 					for(var prop in key){
-						if (!key.hasOwnProperty(prop)) continue;
-						return_[prop] = this.set(prop, key[prop]);
+						if (!Object.prototype.hasOwnProperty.call(key, prop)) continue;
+						return_[prop] = this.set(prop, key[prop], null, e);
 					}
+
 					return return_;
 				}
+
+				// ...........................................................
 
 				if (typeof key != "string") return false;
 
 				key = key.toLowerCase();
 
-				// .....................
+				var triggerArg = { value: value };
 
 				if (typeof e == "undefined") e = true;
 
-				var eTrigger = function(name){
-					if (e){
-						var ev = new $.Event(name);
-						ev.value = value;
-						self.trigger("set", ev);
-					}
-				};
-
-				// .....................
-
-				eTrigger("set:"+key);
-
-				var aliases = {};
-
-				var methodAliases = {};
-
-				if ( typeof aliases[key] == "string" ) {
-					key = aliases[key];
-				}
-
-				eTrigger("beforeSet:"+key);
-
-				if ( typeof methodAliases[key] == "string" ) {
-					key = methodAliases[key];
-					if (typeof this[key] != "function"){
-						return false;
-					}
-					if (typeof arg == "undefined") arg = Object.create(null);
-					tmp = this[key](value,arg);
-					eTrigger("afterSet:"+key);
-					return tmp;
+				if (e) {
+					this.trigger("set", triggerArg);
+					this.trigger("set:" + key, triggerArg);
+					this.trigger("beforeSet:" + key, triggerArg);
 				}
 
 				this._props[key] = value;
 
-				eTrigger("afterSet:"+key);
+				e && this.trigger("afterSet:" + key, triggerArg);
 
 				return true;
 
-			},
-
-
-
-			"getInstaces" : function(){
-				return this.getInstances.apply(this, arguments);
 			},
 
 
@@ -170,22 +110,23 @@
 			 * @return {Array}
 			 * */
 			"getInstances": function(arg){
+				// TODO this.fx.filter
 				if (!arguments.length) return this.instances;
 
 				if (typeof arg != "object") arg = Object.create(null);
 
 				var name = (  $.inArray(typeof arg.name, ["string","number"]) > -1 ? arg.name : null );
+				// TODO name !=== null - это что за херня?
 
 				var tmp = [];
 				for(var c=0; c<this.instances.length; c++){
-					if (name !== null && this.instances[c].get("name") != name ){
+					if (name !== null && this.instances[c].get("name", void 0, false) != name ){
 						continue;
 					}
 					tmp.push(this.instances[c]);
 				}
 				return tmp;
 			},
-
 
 
 			/**
@@ -195,14 +136,15 @@
 			 * @memberof MSelectDBox
 			 * */
 			"removeInstances": function(arg){
+				// TODO this.fx.filter
 				if (typeof arg != "object"){
 					return;
 				}
 				var name = typeof arg.name != "string" ? null : arg.name;
 				var tmp = [];
 				for(var c=0; c<this.instances.length; c++){
-					if (  this.instances[c].get("name") == name  ){
-						$(this.instances[c].get("dbox")).detach();
+					if (  this.instances[c].get("name", void 0, false) == name  ){
+						$(this.instances[c].get("dbox", void 0, false)).detach();
 						continue;
 					}
 					tmp.push(this.instances[c]);
@@ -248,22 +190,6 @@
 			/**
 			 * @ignore
 			 * */
-			"_eventDefaultSet": function(){
-				this.trigger(arguments[1].type, arguments[1]);
-			},
-
-
-			/**
-			 * @ignore
-			 * */
-			"_eventDefaultGet": function(){
-				this.trigger(arguments[1].type, arguments[1]);
-			},
-
-
-			/**
-			 * @ignore
-			 * */
 			"_eventSetList": function(){
 				var e = arguments[1];
 				this.set("list", e.value, null, false);
@@ -290,15 +216,15 @@
 			 * */
 			"_eventDefaultKeyUp": function(e){
 
-				var self						= this;
-				var target					= self.get("target");
-				var dboxInput			= self.get("dbox_input");
-				var keyCode				= e.keyCode;
-				var list						= self.get("list");
-				var dbox						= self.get("dbox");
-				var contextElement		= e.currentTarget;
-
-				var serviceKeyCodes = [37,38,39,40,9,13,18,17,16,20,27];
+				var
+					self						= this,
+					target					= self.get("target", null, 0),
+					dboxInput				= self.get("dbox_input", null, 0),
+					keyCode				= e.keyCode,
+					list						= self.get("list", null, 0),
+					dbox						= self.get("dbox", null, 0),
+					contextElement		= e.currentTarget,
+					serviceKeyCodes		= [37,38,39,40,9,13,18,17,16,20,27];
 
 				// Трансфер строки из target в dbox_input и наоборот
 				// ------------------------------------------------------------------------------------
@@ -317,69 +243,61 @@
 				clearTimeout(self._timers.autoComplete);
 
 				self._timers.autoComplete = setTimeout(function(){
-					var value, v;
+					var value, v, elem, selectedIds;
 
 					// ... autoComplete
-					if (  self.get("autoComplete")  ){
+					if (  self.get("autoComplete", null, 0)  ){
 
 						// left arrow, up arrow, right arrow, down arrow, tab, enter, alt, ctrl, shift, caps lock, escape
-						if (  $.inArray(keyCode, serviceKeyCodes) > -1 ){
+						if (  $.inArray(keyCode, serviceKeyCodes) < 0 ) {
 
-						} else {
-
-							var li	= $(".m-select-d-box__list-item", dbox);
-							value	= contextElement.value.toLowerCase();
-							// value	= self.fx.trim(value,";, ","both");
-							value	= self.fx.msplit([';',','],value);
-							value = value[value.length-1];
+							value = contextElement.value.toLowerCase().split(/[;,]/ig);
+							value = value[value.length - 1];
 
 							// var pattern = new RegExp(value.trim());
 
-							for(v=0; v<li.length; v++){
-								var msdbid = parseInt(li[v].getAttribute("data-msdbid"));
-								var jqLi = $(li[v]);
+							for(v=0; v<list.length; v++){
+								// jqLi = $(list[v].elem);
+								elem = [list[v].elem];
 
 								if (  !value  ){
-									jqLi.removeClass('m-select-d-box__list-item_hidden');
+									$.fn.removeClass.call(elem, 'm-select-d-box__list-item_hidden');
 
-								} else if (
-									!self._optionFiltersMatcher(self.get("optionFilters"), value, list[msdbid].label)
-								){
-									jqLi.addClass('m-select-d-box__list-item_hidden');
+								} else if (  !self._optionFiltersMatcher(self.get("optionFilters", null, 0), value, list[v].label)  ){
+									$.fn.addClass.call(elem, 'm-select-d-box__list-item_hidden');
 
 								} else {
-									jqLi.removeClass('m-select-d-box__list-item_hidden');
-
+									$.fn.removeClass.call(elem, 'm-select-d-box__list-item_hidden');
 								}
 
-								jqLi.removeClass('m-select-d-box__list-item_hover');
+								$.fn.removeClass.call(elem, 'm-select-d-box__list-item_hover');
 							}
 
 							if (  !self._isMobileState()  ){
 								self.calcPosition();
 							}
+
 						}
 
 					}
 
 
-					if (  self.get("multiple")  ){
+					if (  self.get("multiple", null, 0)  ){
 
 						if (  keyCode == 8  ){
 							// keycode 8 - backspace;
-							value = self.fx.trim(contextElement.value, " ;,", "both");
-							value = self.fx.msplit([";",","],value);
+							value = self.fx.trim(contextElement.value, " ;,").split(/[,;]/ig);
+							selectedIds = self.getSelectedKeys();
 
-							for(v=0; v<value.length; v++){
-								value[v] = value[v].trim();
-							}
+							for(v=0; v<value.length; v++) value[v] = value[v].trim();
 
-							for(var prop in list){
-								if (!list.hasOwnProperty(prop)) continue;
-								list[prop].selected = ($.inArray(list[prop].label.trim(), value)> -1);
-							}
+							self._selectByLabel(value, 1);
 
-							self.applySelectedToList();
+							self.applySelectedToList(
+								self._getItemsByID(
+									selectedIds.concat(self.getSelectedKeys())
+								)
+							);
 							self.applySelectedToInput();
 						}
 
@@ -395,15 +313,17 @@
 			 * */
 			"_eventDefaultKeyDownMultipleFalse": function(e){
 
-				var self = this;
-
-				var ul, li, c, L;
-
-				var dbox = self.get("dbox");
-				var target = self.get("target");
+				var
+					self = this,
+					list = this.get("list", null, 0),
+					selectedCache = this.get("selectedCache", null, 0),
+					selected = selectedCache[Object.keys(selectedCache)[0]],
+					exSelected = selected,
+					dbox = self.get("dbox", null, 0),
+					target = self.get("target", null, 0);
 
 				// Если список без множественного выделения
-				if (  self.get("multiple")  ) return; // close.if.!multiple
+				if (  self.get("multiple", null, 0)  ) return; // close.if.!multiple
 
 				if (  $.inArray(e.keyCode, [37,39,9,18,17,16,20,27]) > -1  ){
 					// left, right, tab, alt, ctrl, shift, caps, esc
@@ -413,11 +333,10 @@
 
 					if (  !self.isActive()  ){
 						self.open();
-						self._eventFocus.apply(target, [self, e]);
+						self._eventFocus.call(target, self, e);
 
 					} else {
 						self.close();
-
 					}
 
 				} else if (  $.inArray(e.keyCode, [38,39,40]) > -1 ) {
@@ -426,38 +345,25 @@
 
 					if (  !self.isActive()  ) return;
 
-					ul = $("ul", dbox).get(0);
+					if (!selected) {
+						selected = list[0];
 
-					li = $('li:not(.m-select-d-box__list-item_hidden)', dbox);
-
-					var selectedLi = -1;
-					var jqli;
-
-					for(c=0, L=li.length; c<L; c++){
-						jqli = $(li[c]);
-						if (  jqli.hasClass("m-select-d-box__list-item_selected")  ){
-							selectedLi = c;
-							break;
-						}
-					}
-
-					var newSelectedLi;
-
-					if ( e.keyCode == 38 ){
+					} else if ( e.keyCode == 38 ){
 						// up
-						newSelectedLi = (  selectedLi - 1 < 0 ? 0 : selectedLi - 1  );
+						selected = this._getPrevAvailItem(selected) || selected;
+
 					} else if ( e.keyCode == 40 ){
 						// down
-						newSelectedLi = (  selectedLi + 1 > li.length - 1 ? li.length - 1 : selectedLi + 1  );
-					} else if (e.keyCode == 39){
-						return;
+						selected = this._getNextAvailItem(selected) || selected;
+
 					} else {
 						return;
 					}
 
-					var selectedKey = parseInt(li[newSelectedLi].getAttribute("data-msdbid"));
-
-					self._selectByID(selectedKey);
+					// TODO вызывать рендер
+					self._selectByID(selected.id, 1);
+					self.applySelectedToInput();
+					self.applySelectedToList([exSelected, selected]);
 
 					self._calcScrollBarPosition();
 
@@ -475,8 +381,9 @@
 			"_eventDefaultKeyDownMultipleTrue": function(e){
 
 				var self = this, c, L;
-				var dbox = self.get("dbox");
-				var selectedKey;
+				var list = self.get("list", null, 0);
+				var dbox = self.get("dbox", null, 0);
+				var msdbid, hoveredLi, selectedIds;
 
 				if (  self.get("multiple")  ){
 					if (  $.inArray(e.keyCode, [37,39,9,18,17,16,20,27]) > -1  ){
@@ -484,25 +391,23 @@
 
 					} else if (  e.keyCode == 13  ){
 						// Enter
-						var hoveredLi = $(".m-select-d-box__list-item_hover",dbox);
+						// TODO кешировать hover ref_1
+						hoveredLi = $(".m-select-d-box__list-item_hover", dbox);
 
 						if (  !hoveredLi.length  ) return;
 
-						hoveredLi = hoveredLi.get(0);
+						msdbid = +hoveredLi.attr("data-msdbid");
 
-						var selectedKeys = self.getSelectedKeys();
+						selectedIds = self.getSelectedKeys();
 
-						selectedKey = parseInt(hoveredLi.getAttribute('data-msdbid'));
+						list[msdbid].selected
+							? self._deselectByID(msdbid)
+							: self._selectByID(msdbid);
 
-						var tmp = $.inArray(selectedKey, selectedKeys);
+						selectedIds = selectedIds.concat(selectedIds, self.getSelectedKeys());
 
-						if (  tmp > -1  ){
-							selectedKeys[tmp] = null;
-						} else {
-							selectedKeys.push(selectedKey);
-						}
-
-						self._selectByID(selectedKeys);
+						self.applySelectedToInput();
+						self.applySelectedToList(self._getItemsByID(selectedIds));
 
 						self.trigger("select", e);
 
@@ -553,46 +458,38 @@
 			/**
 			 * @ignore
 			 * */
-			"_eventFocus": function(context,e){
-				var msdb_value, c, v;
-
-				var self		= this;
-				var list		= self.get("list");
-				var dbox	= self.get("dbox");
+			"_eventFocus": function(context,e) {
+				var c, v, value, msdb_value,
+					self = this,
+					selectedIds = self.getSelectedKeys(),
+					list = self.get("list", null, 0),
+					dbox	= self.get("dbox", null, 0),
+					contextElement = e.currentTarget || (this instanceof Element ? this : null);
 
 				self.open();
 
-				var contextElement = e.currentTarget || (this instanceof Element ? this : null);
-
-				if (  self.fx.isTextInput(contextElement)  ){
+				if (  self.fx.isTextInput(contextElement)  ) {
 					msdb_value = contextElement.getAttribute('data-msdb-value');
 					if ( msdb_value ) msdb_value = msdb_value.trim();
 
 					// Если в инпуте уже есть значения, отметить их в списке как выбранные
 					if (!msdb_value){
-						var value = self.fx.msplit([',',';'],self.fx.trim(contextElement.value,",; ","both"));
-						for(c=0; c<value.length; c++){
-							value[c] = value[c].trim();
-							for(v=0; v<list.length; v++){
-								if (list[v].label == value[c]){
-									list[v].selected = true;
-								}
-							}
-						}
+						value = self.fx.trim(contextElement.value,",; ").split(/[;,]/ig);
+
+						for(c=0; c<value.length; c++) value[c] = value[c].trim();
+
+						self._selectByLabel(value, 1);
+
 					} else {
-						msdb_value = self.fx.msplit([',',';'],msdb_value);
-						for(c=0; c<msdb_value.length; c++){
-							msdb_value[c] = msdb_value[c].trim();
-							for(v=0; v<list.length; v++){
-								if ( list[v].value == msdb_value[c] ){
-									list[v].selected = true;
-									break;
-								}
-							}
-						}
+						msdb_value = msdb_value.split(/[;,]/ig);
+
+						for(c=0; c<msdb_value.length; c++) msdb_value[c] = msdb_value[c].trim();
+
+						self._selectByValue(msdb_value, 1);
 					}
 				}
 
+				// TODO ref_1. Перебирать кешированный список
 				// Все строки
 				var dbox_li = $("li",dbox);
 
@@ -614,13 +511,15 @@
 					}
 				}
 
+				selectedIds = selectedIds.concat(self.getSelectedKeys());
+
 				// Записать value внутри инпута
 				if (  !self.get("freeWrite")  ){
 					self.applySelectedToInput();
 				}
 
 				// Отметить выбранные строки
-				self.applySelectedToList();
+				self.applySelectedToList(self._getItemsByID(selectedIds));
 
 				// Положение ползунка
 				self._calcScrollBarPosition();
@@ -731,8 +630,6 @@
 					clearTimeout(self._timers.focusoutInputs);
 				});
 
-				this.on("set",this._eventDefaultSet);
-				this.on("get", this._eventDefaultGet);
 				this.on("afterSet:list", this._eventSetList);
 
 				// ----------------------------------------------------------------
@@ -802,7 +699,7 @@
 			/**
 			 * @description Fire specified event
 			 * @param {String} eventName
-			 * @param {Event} e - Event object
+			 * @param {Event | Object} e - Event or data object
 			 * @memberof MSelectDBox
 			 * */
 			"trigger": function(eventName, e){
@@ -816,18 +713,20 @@
 					&& Array.isArray(this.events[eventName])
 				){
 
+					// window.CustomEvent может оказаться undefined
+					// и тогда оператор выбросит ошибку
 					if (
 						!e
 						|| (
-							e instanceof (window.CustomEvent || new Function()) == false
-							&& e instanceof (window.Event || new Function()) == false
+							e instanceof (window.CustomEvent || Function) == false
+							&& e instanceof (window.Event || Function) == false
 							&& e instanceof $.Event == false
 						)
 					){
-						e = $.Event(eventName);
+						e = $.Event(eventName, e);
 
 					} else if (e instanceof $.Event == false) {
-						e = $.Event(e);
+						e = $.Event(eventName, e);
 					}
 
 					var events = this.events[eventName];
@@ -836,7 +735,7 @@
 
 						if (typeof events[c] != "function") continue;
 
-						events[c].apply(this,[this, e]);
+						events[c].call(this, this, e);
 
 					}
 
@@ -976,113 +875,118 @@
 			 * @description Global styles by selectors
 			 * @memberof MSelectDBox
 			 * */
-			"_globalStyles": {
-				// TODO Добавить overflow:hidden для body, чтобы не прокручивалась страница
-				".m-select-d-box": {
-					position: "absolute", display: "block", width: "168px", padding: '8px', height: "auto", "box-shadow": "0 0px 8px rgba(0, 0, 0, 0.24)", "background-color": "#FFF", "border-radius": "3px"
-				},
-				".m-select-d-box:after": {
-					content:'\'\'', position: "absolute", "border-left": "10px solid transparent", "border-right": "9px solid transparent", "border-bottom": "10px solid white", top: "-10px", left: "50%", "margin-left": "-10px"
-				},
-				".m-select-d-box_bottom:after": {
-					content:'\'\'', position: "absolute", "border-left": "10px solid transparent", "border-right": "9px solid transparent", "border-bottom": "none", "border-top": "10px solid white", top: "auto", bottom: "-10px", left: "50%", "margin-left": "-10px"
-				},
-				".m-select-d-box__list-container": {
-					position: "relative", margin: "0px", padding: "0px", "max-height": "200px", "overflow-x": "hidden"
-				},
-				".m-select-d-box__list-item": {
-					position: "relative", padding: "5px", "background-color": "none", color: "black", display: "block", "line-height": "100%", cursor: "pointer", "font-size": "12px"
-				},
-				".m-select-d-box__list-item:hover, .m-select-d-box__list-item_hover": {
-					"background-color": "#e6e6e6"
-				},
-				".m-select-d-box__list-item_selected": {
-					"background-color": "#C40056", color:"white"
-				},
-				".m-select-d-box__list-item_selected:hover, .m-select-d-box__list-item_selected.m-select-d-box__list-item_hover": {
-					"background-color": "#DB2277"
-				},
-				".m-select-d-box__list-item_selected:before": {
-					content:'\':: \''
-				},
-				".m-select-d-box__list-item:active, .m-select-d-box__list-item_selected:active": {
-					"background-color": "#b80000", color: "white"
-				},
-				".m-select-d-box__list-item_hidden": {
-					display:"none"
-				},
-				".m-select-d-box__search-input": {
-					border: "1px solid #a2a2a2", width: "100%", "line-height": "100%", "font-size": "14px", "border-width": "0 0 2px 0", "padding": "8px", "box-sizing": "border-box"
-				},
-				".m-select-d-box__search-input-container": {
-					"margin-bottom": "12px", display: "none"
-				},
-				".m-select-d-box__search-input-container_active": {
-					display: "block"
-				},
-				".m-select-d-box-fade": {
-					display: "none", width: 0, height: 0, left: 0, top: 0
-				},
-				".m-select-d-box-fade__outside-click-label": {
-					position: "absolute", width: "100%", bottom: 0, "padding": "10px", background: "black", color: "white", "text-align": "center", "font-size": "1em", "box-sizing": "border-box"
-				},
-				".m-select-d-box-fade__outside-click-label-text": {},
-				".m-select-d-box-fade__outside-click-label-icon": {
-					position: "relative", "border-radius": "50%", "margin-right": "5px", border: "2px solid white", display: "inline-block", height: "16px", width: "16px", "vertical-align": "middle"
-				},
-				".m-select-d-box-fade__outside-click-label-icon:after": {
-					content:'\'\'', position: "absolute", top: "50%", left: "50%", height: "80%", width: "2px", transform: "rotate(45deg)", "margin-left": "-1px", "margin-top": "-40%", background: "white"
-				},
-				".m-select-d-box-fade__outside-click-label-icon:before": {
-					content:'\'\'', position: "absolute", top: "50%", left: "50%", height: "80%", width: "2px", transform: "rotate(-45deg)", "margin-left": "-1px", "margin-top": "-40%", background: "white"
-				},
-				"@media screen and (max-width: 640px)": {
+			"_globalStyles": (function() {
+				var styles = {
+					// TODO Добавить overflow:hidden для body, чтобы не прокручивалась страница
 					".m-select-d-box": {
-						position: "fixed", width: "80% !important", padding: "0 !important", left: "10% !important", top:"5% !important", "max-height": "90%", "box-shadow": "none", "border-radius": "0px", "box-sizing": "border-box"
+						position: "absolute", display: "block", width: "168px", padding: '8px', height: "auto", "box-shadow": "0 0px 8px rgba(0, 0, 0, 0.24)", "background-color": "#FFF", "border-radius": "3px"
 					},
 					".m-select-d-box:after": {
-						content: "none"
+						content:'\'\'', position: "absolute", "border-left": "10px solid transparent", "border-right": "9px solid transparent", "border-bottom": "10px solid white", top: "-10px", left: "50%", "margin-left": "-10px"
+					},
+					".m-select-d-box_bottom:after": {
+						content:'\'\'', position: "absolute", "border-left": "10px solid transparent", "border-right": "9px solid transparent", "border-bottom": "none", "border-top": "10px solid white", top: "auto", bottom: "-10px", left: "50%", "margin-left": "-10px"
 					},
 					".m-select-d-box__list-container": {
-						"max-height": "none"
+						position: "relative", margin: "0px", padding: "0px", "max-height": "200px", "overflow-x": "hidden"
 					},
 					".m-select-d-box__list-item": {
-						padding: "1em", "font-size": "1em"
+						position: "relative", padding: "5px", "background-color": "none", color: "black", display: "block", "line-height": "100%", cursor: "pointer", "font-size": "12px"
 					},
-					".m-select-d-box__search-input-container": {
-						"margin-bottom": "12px", display: "block"
+					".m-select-d-box__list-item:hover, .m-select-d-box__list-item_hover": {
+						"background-color": "#e6e6e6"
+					},
+					".m-select-d-box__list-item_selected": {
+						"background-color": "#C40056", color:"white"
+					},
+					".m-select-d-box__list-item_selected:hover, .m-select-d-box__list-item_selected.m-select-d-box__list-item_hover": {
+						"background-color": "#DB2277"
+					},
+					".m-select-d-box__list-item_selected:before": {
+						content:'\':: \''
+					},
+					".m-select-d-box__list-item:active, .m-select-d-box__list-item_selected:active": {
+						"background-color": "#b80000", color: "white"
+					},
+					".m-select-d-box__list-item_hidden": {
+						display:"none"
 					},
 					".m-select-d-box__search-input": {
-						"line-height": "1em", "font-size": "1em", "padding": "1em"
+						border: "1px solid #a2a2a2", width: "100%", "line-height": "100%", "font-size": "14px", "border-width": "0 0 2px 0", "padding": "8px", "box-sizing": "border-box"
+					},
+					".m-select-d-box__search-input-container": {
+						"margin-bottom": "12px", display: "none"
+					},
+					".m-select-d-box__search-input-container_active": {
+						display: "block"
 					},
 					".m-select-d-box-fade": {
-						width: "100%", height: "100%", position: "fixed", left: 0, top: 0, "background-color": "rgba(0, 0, 0, 0.33)", display: "block"
-					}
-				},
-				"@media screen and (max-width: 740px)": {
-					"@media screen and (min-resolution: 2dppx)": {
-						// Здесь копия max-width 640px
-						// см._buildStyles
-					}
-				},
+						display: "none", width: 0, height: 0, left: 0, top: 0
+					},
+					".m-select-d-box-fade__outside-click-label": {
+						position: "absolute", width: "100%", bottom: 0, "padding": "10px", background: "black", color: "white", "text-align": "center", "font-size": "1em", "box-sizing": "border-box"
+					},
+					".m-select-d-box-fade__outside-click-label-text": {},
+					".m-select-d-box-fade__outside-click-label-icon": {
+						position: "relative", "border-radius": "50%", "margin-right": "5px", border: "2px solid white", display: "inline-block", height: "16px", width: "16px", "vertical-align": "middle"
+					},
+					".m-select-d-box-fade__outside-click-label-icon:after": {
+						content:'\'\'', position: "absolute", top: "50%", left: "50%", height: "80%", width: "2px", transform: "rotate(45deg)", "margin-left": "-1px", "margin-top": "-40%", background: "white"
+					},
+					".m-select-d-box-fade__outside-click-label-icon:before": {
+						content:'\'\'', position: "absolute", top: "50%", left: "50%", height: "80%", width: "2px", transform: "rotate(-45deg)", "margin-left": "-1px", "margin-top": "-40%", background: "white"
+					},
+					"@media screen and (max-width: 640px)": {
+						".m-select-d-box": {
+							position: "fixed", width: "80% !important", padding: "0 !important", left: "10% !important", top:"5% !important", "max-height": "90%", "box-shadow": "none", "border-radius": "0px", "box-sizing": "border-box"
+						},
+						".m-select-d-box:after": {
+							content: "none"
+						},
+						".m-select-d-box__list-container": {
+							"max-height": "none"
+						},
+						".m-select-d-box__list-item": {
+							padding: "1em", "font-size": "1em"
+						},
+						".m-select-d-box__search-input-container": {
+							"margin-bottom": "12px", display: "block"
+						},
+						".m-select-d-box__search-input": {
+							"line-height": "1em", "font-size": "1em", "padding": "1em"
+						},
+						".m-select-d-box-fade": {
+							width: "100%", height: "100%", position: "fixed", left: 0, top: 0, "background-color": "rgba(0, 0, 0, 0.33)", display: "block"
+						}
+					},
+					"@media screen and (max-width: 740px)": {
+						"@media screen and (min-resolution: 2dppx)": {
+							// Здесь копия max-width 640px
+							// см._buildStyles
+						}
+					},
 
-				// Стоит здесь для высшего приоритета
-				".m-select-d-box_hidden": {
-					display: "none"
-				}
+					// Стоит здесь для высшего приоритета
+					".m-select-d-box_hidden": {
+						display: "none"
+					}
 
-			},
+				};
+
+				// Копируется мобильные стили для устройств с высокой плотностью точек
+				styles["@media screen and (max-width: 740px)"]["@media screen and (min-resolution: 2dppx)"] = styles["@media screen and (max-width: 640px)"];
+
+				return styles;
+			})(),
 
 
 			/**
 			 * @ignore
 			 * */
 			"_initStyles": function(){
-
 				if (  !$('#m-select-d-box-style').length  ){
 					this._buildStyles();
 				}
-
 			},
 
 
@@ -1090,13 +994,6 @@
 			 * @ignore
 			 * */
 			"_buildStyles": function(){
-
-				// Копируется мобильные стили для устройств с высокой плотностью точек
-				// TODO Перенести объявление глобальных стилей в анонимную функцию вместе с этим куском кода
-				this._globalStyles["@media screen and (max-width: 740px)"]["@media screen and (min-resolution: 2dppx)"] = this._globalStyles["@media screen and (max-width: 640px)"];
-
-				// ------------------------------------------------------------------------------------------------
-
 				var body = $("body");
 
 				var buildCSS= function(obj){
@@ -1128,7 +1025,6 @@
 				}
 
 				styleElem.html(css);
-
 			},
 
 
@@ -1202,7 +1098,6 @@
 							if (  option.type != typeof arg[prop]  ) {
 								throw new Error("Argument data type mismatch (key: '" + prop + "')");
 							}
-
 						}
 
 						if (  option.hasOwnProperty("into")  ){
@@ -1214,7 +1109,6 @@
 
 							} else if (  option.into == "float"  ) {
 								arg[prop] = parseFloat(arg[prop])
-
 							}
 						}
 
@@ -1239,6 +1133,14 @@
 					}
 
 				}
+
+				this.set({
+					firstItem: void 0,
+					lastItem: void 0,
+					selectedCache: Object.create(null),
+					valuesCache: Object.create(null),
+					labelsCache: Object.create(null)
+				}, null, 0);
 
 			},
 
@@ -1328,112 +1230,111 @@
 			 * */
 			"_initList": function(){
 
-				var c, L;
+				var list = this.get("list", null, 0);
 
-				if (  !$.isArray(this.get("list"))  ) {
+				if (  !$.isArray(list)  ) {
 					this.set("list", [], null, false);
 					return false;
 				}
 
-				var list = this.get("list");
+				var c, listItem, prev,
+					labelCache = Object.create(null),
+					valueCache = Object.create(null),
+					self = this,
+					dbox = this.get("dbox", null, 0),
+					ul = $(".m-select-d-box__list-container", dbox).get(0);
 
-				var dbox = this.get("dbox");
+				!this._onItemClick && (this._onItemClick = function(e) {
+					clearTimeout(self._timers.focusoutInputs);
 
-				var tmplist = [];
+					var msdbid = this.getAttribute('data-msdbid');
+					var list = self.get("list", null, 0);
+					var selectedIds = self.getSelectedKeys().concat(msdbid);
 
-				// TODO FlattenFn
+					if (  self.get("multiple", null, 0)  ) {
+						list[msdbid].selected
+							? self._deselectByID(msdbid)
+							: self._selectByID(msdbid, 0);
 
-				for ( c= 0, L = list.length; c<L; c++ ){
-					if (  $.inArray(typeof list[c], ["number","string"]) != -1  ){
+					} else {
+						self._selectByID(msdbid, 1);
+					}
 
-						tmplist.push({
-							"value": list[c].toString(),
-							"label": list[c].toString(),
+					self.applySelectedToInput();
+					self.applySelectedToList(self._getItemsByID(selectedIds));
+
+					self.trigger("select", e);
+
+					self.calcPosition();
+
+					if (!self.get("multiple", null, 0)) self.close();
+				});
+
+				!this._onMouseLeave && (this._onMouseLeave = function() {
+					var jqThis = $(this);
+					if (  jqThis.hasClass("m-select-d-box__list-item_hover")  ){
+						jqThis.removeClass("m-select-d-box__list-item_hover");
+					}
+				});
+
+				ul.innerHTML = "";
+
+				for (c=0; c<list.length; c++) {
+
+					if (  $.inArray(typeof list[c], ["number","string"]) > -1  ) {
+						list[c] = {
+							"value": list[c] + "",
+							"label": list[c] + "",
 							"selected": false
-						});
+						};
 
 					} else if ( typeof list[c] == "object" ) {
-
 						if (
-							list[c].hasOwnProperty("value")
-							&& list[c].hasOwnProperty("label")
-						){
-							if (  typeof list[c].selected == "undefined"  ){
+							this.fx.hop(list[c], "value")
+							&& this.fx.hop(list[c], "label")
+						) {
+							if (  typeof list[c].selected == "undefined"  ) {
 								list[c].selected = false;
+
 							} else {
 								list[c].selected = Boolean(list[c].selected);
 							}
-							tmplist.push(list[c]);
 						}
-
 					}
-				}
 
-				list = tmplist;
-				this.set("list", tmplist, null, false);
+					list[c].id = c;
+					valueCache[list[c].value] = list[c];
+					labelCache[list[c].label] = list[c];
 
-				// -------------------------------------------------------------------
+					if (prev) {
+						prev.next = list[c];
+						list[c].prev = prev;
+					}
 
-				var ul = $(".m-select-d-box__list-container", dbox).get(0);
-				ul.innerHTML = "";
+					prev = list[c];
 
-				var self = this;
+					// ------------------------------------------------------------
 
-				for(var itemKey in list ){
-					if (!list.hasOwnProperty(itemKey)) continue;
-
-					var li = document.createElement("li");
-
-					li.className = "m-select-d-box__list-item";
-
-					li.setAttribute('data-msdbid',itemKey);
+					listItem = list[c];
+					listItem.elem = document.createElement("li");
+					listItem.elem.className = "m-select-d-box__list-item";
+					listItem.elem.setAttribute('data-msdbid', c);
 
 					// addEventListener || attachEvent
-					$(li).bind(
-						"click",
-						function(e){
-							var selectedKeys = [];
-
-							clearTimeout(self._timers.focusoutInputs);
-
-							var msdbid = parseInt(this.getAttribute('data-msdbid'));
-
-							if (  self.get("multiple")  ){
-
-								list[msdbid].selected = (list[msdbid].selected == false);
-								selectedKeys = self.getSelectedKeys();
-
-							} else {
-
-								selectedKeys = [msdbid];
-
-							}
-
-							self._selectByID(selectedKeys);
-
-							self.trigger("select", e);
-
-							self.calcPosition();
-
-							if (!self.get("multiple")){
-								self.close();
-							}
-
-						},
-						null
-					);
+					$(listItem.elem).bind("click", this._onItemClick, null);
 
 					// addEventListener || attachEvent
-					$(li).bind("mouseleave",function(){
-						var jqThis = $(this);
-						if (  jqThis.hasClass("m-select-d-box__list-item_hover")  ){
-							jqThis.removeClass("m-select-d-box__list-item_hover");
-						}
-					},null);
+					$(listItem.elem).bind("mouseleave", this._onMouseLeave, null);
 
-					li.innerHTML = list[itemKey].label;
-					ul.appendChild(li);
-				}
+					listItem.elem.innerHTML = listItem.label;
+					ul.appendChild(listItem.elem);
+
+				} // close.list.for
+
+				this.set('firstItem', list[0], null, 0);
+				this.set("lastItem", list[list.length - 1], null, 0);
+				this.set("labelsCache", labelCache, null, 0);
+				this.set("valuesCache", valueCache, null, 0);
 
 			},
 
@@ -1478,18 +1379,18 @@
 				// --------------------------------------------------------------------------------
 				// Целевой элемент
 
-				var target = this.get("target");
+				var target = this.get("target", null, 0);
 
 				// --------------------------------------------------------------------------------
 				// Контейнер списка
 
-				var dbox = this.get("dbox");
+				var dbox = this.get("dbox", null, 0);
 
 				// --------------------------------------------------------------------------------
 
-				if (  self.get("name")  ){
-					target.setAttribute("data-msdb-name",self.get("name"));
-					dbox.setAttribute("data-msdb-name", self.get("name"));
+				if (  self.get("name", null, 0)  ){
+					target.setAttribute("data-msdb-name", self.get("name", null, 0));
+					dbox.setAttribute("data-msdb-name", self.get("name", null, 0));
 				}
 
 				self.on(
@@ -1507,17 +1408,14 @@
 					}
 				);
 
-				// ------------------------------------------------------------
-
-
-
 				// --------------------------------------------------------------
 				// Инициализация матчеров строк
 
-				if (  !self.get("optionFilters")  ){
+				if (  !self.get("optionFilters", null, 0)  ){
 					self.set(
 						"optionFilters",
-						[self.defaultOptionFilters.default]
+						[self.defaultOptionFilters.default],
+						null, false
 					);
 				}
 
@@ -1561,8 +1459,8 @@
 			"calcPosition" : function(){
 				var self = this;
 				var body = $("body").get(0);
-				var target = this.get("target", null, null);
-				var dbox = this.get("dbox", null, null);
+				var target = this.get("target", null, 0);
+				var dbox = this.get("dbox", null, 0);
 				var jqDBox = $(dbox);
 				var offset = $(target).offset();
 				var thisWidth = target.clientWidth;
@@ -1591,16 +1489,15 @@
 			"_calcScrollBarPosition": function(){
 
 				var selectedLi;
-				var dbox = this.get("dbox");
+				var dbox = this.get("dbox", null, 0);
 
 				var ul = $(".m-select-d-box__list-container",dbox).get(0);
 
-				if (  !this.get("multiple")  ){
+				if (  !this.get("multiple", null, 0)  ){
 					selectedLi = $(".m-select-d-box__list-item_selected",dbox);
 
 				} else {
 					selectedLi = $(".m-select-d-box__list-item_hover",dbox);
-
 				}
 
 				if (!selectedLi.length) return;
@@ -1628,7 +1525,7 @@
 			 * @ignore
 			 * */
 			"_calcListContainerHeight": function(){
-				var listContainer = $(this.get("dbox")).find(".m-select-d-box__list-container").get(0);
+				var listContainer = $(this.get("dbox", null, 0)).find(".m-select-d-box__list-container").get(0);
 				if (  this._isMobileState()  ){
 					var vh = window.innerHeight / 100;
 					listContainer.style.maxHeight = ((vh * 90) - 64 - 40) + "px";
@@ -1642,18 +1539,9 @@
 			 * @ignore
 			 * */
 			"_isDBoxElement": function(element){
-				var dbox = this.get("dbox", null, null);
-				// var each = $("*", dbox).toArray();
-				var each = $(dbox).find("*");
-				if (each){
-					each = Array.prototype.slice.call(each,0);
-					each.push(dbox);
-					for (var c=0; c<each.length; c++){
-						if ( each[c] == element ) return true;
-					}
-				}
+				var dbox = this.get("dbox", null, 0);
 
-				return false;
+				return !!$(dbox).find(element).length || dbox == element
 			},
 
 
@@ -1661,21 +1549,9 @@
 			 * @ignore
 			 * */
 			"_isTargetElement": function(element){
-				var target = this.get("target", null, null);
-				// var each = $("*",target).toArray();
-				var each = $(target).find("*");
-				if (each){
-					each = Array.prototype.slice.call(each,0);
-					each.push(target);
-					// На случай если target не просто <input> а сложный элемент
-					for(var c=0; c<each.length; c++){
-						if (each[c] == element){
-							return true;
-						}
-					}
-				}
+				var target = this.get("target", null, 0);
 
-				return false;
+				return !!$(target).find(element).length || target == element
 			},
 
 
@@ -1709,6 +1585,7 @@
 			 * */
 			"_isBoxBottomState": function(){
 				var dbox = this.get("dbox", null, null);
+
 				return Boolean(dbox.className.match(new RegExp("m-select-d-box_bottom")));
 			},
 
@@ -1724,19 +1601,7 @@
 			 * @return {Array}
 			 * */
 			"getSelectedKeys": function(){
-				var keys = [];
-				var list = this.get("list");
-
-				for (var c=0; c<list.length; c++){
-					if (
-						typeof list[c]['selected'] != "undefined"
-						&& list[c]['selected']
-					){
-						keys.push(c);
-					}
-				}
-
-				return keys;
+				return Object.keys(this.get('selectedCache', null, 0));
 			},
 
 
@@ -1746,17 +1611,12 @@
 			 * @return {Array}
 			 * */
 			"getSelectedValues": function(){
-				var values = [];
-				var list = this.get("list");
+				var values = [], cache = this.get("selectedCache", null, 0);
 
-				for (var c=0; c<list.length; c++){
-					if (
-						typeof list[c]['selected'] != "undefined"
-						&& list[c]['selected']
-					){
-						values.push(list[c].value);
-					}
+				for (var c in cache) {
+					values.push(cache[c].value);
 				}
+
 				return values;
 			},
 
@@ -1767,18 +1627,13 @@
 			 * @return {Array}
 			 * */
 			"getSelectedLabels": function(){
-				var labels = [];
-				var list = this.get("list");
+				var label = [], cache = this.get("selectedCache", null, 0);
 
-				for (var c=0; c<list.length; c++){
-					if (
-						typeof list[c]['selected'] != "undefined"
-						&& list[c]['selected']
-					){
-						labels.push(list[c].label);
-					}
+				for (var c in cache) {
+					label.push(cache[c].label);
 				}
-				return labels;
+
+				return label;
 			},
 
 
@@ -1789,15 +1644,9 @@
 			 * @return {Boolean}
 			 * */
 			"hasValue": function(value){
+				var cache = this.get("valuesCache", null, 0);
 
-				var list = this.get("list");
-
-				for(var c=0; c<list.length; c++){
-					if (  list[c].value === value  ) return true;
-				}
-
-				return false;
-
+				return !!cache[value];
 			},
 
 
@@ -1808,68 +1657,50 @@
 			 * @return {Boolean}
 			 * */
 			"hasLabel": function(label){
+				var cache = this.get("labelsCache", null, 0);
 
-				var list = this.get("list");
-
-				for(var c=0; c<list.length; c++){
-					if (  list[c].label === label  ) return true;
-				}
-
-				return false;
-
+				return !!cache[label];
 			},
 
 
-			"applySelectedToList" : function(){
-				// var self = this;
-				var dbox = this.get("dbox");
-				var list = this.get("list");
+			"applySelectedToList" : function(list){
+				!list && (list = this.get("list", null, 0));
 
-				var li = $("li",dbox);
+				for (var c in list) {
+					if (  !this.fx.hop(list, c)  ) continue;
+					if (!list[c]) continue;
 
-				li.removeClass("m-select-d-box__list-item_selected");
-
-				for(var c= 0, L=li.length; c<L; c++){
-					var msdbid = li[c].getAttribute("data-msdbid");
-					if (
-						typeof list[msdbid] != "undefined"
-						&& list[msdbid].selected
-					){
-						$(li[c]).addClass('m-select-d-box__list-item_selected');
-					}
+					$.fn[list[c].selected ? "addClass" : "removeClass"]
+						.call([list[c].elem], "m-select-d-box__list-item_selected")
 				}
 			},
 
 
 			"applySelectedToInput" : function(){
 
-				var self			= this;
-				var listValue	= self.getSelectedValues();
-				var listLabel	= self.getSelectedLabels();
-				var target		= this.get("target");
-				var dboxInput = this.get("dbox_input");
+				var self = this,
+					listValue = self.getSelectedValues(),
+					listLabel = self.getSelectedLabels(),
+					target = this.get("target", null, 0),
+					dboxInput = this.get("dbox_input", null, 0);
 
 				dboxInput.value =  listLabel.join("; ") + (!listLabel.length || !this.get("multiple") ? "" : ";");
 
 				var tagName = target.tagName.toLowerCase();
 
 				if ( tagName == "input" ){
-
 					if (  self.fx.isTextInput(target)  ) target.value = dboxInput.value;
 
 				} else if ( tagName == "textarea" ) {
-
 					target.value = listLabel.join(";\n") + (!listLabel.length || !this.get("multiple") ? "" : ";\n");
 
 				} else if ( tagName == "select" ) {
-
 					for (var v=0; v<target.options.length; v++) {
 						target.options[v].selected = $.inArray(target.options[v].value, listValue) > -1;
 					}
-
 				}
 
-				target.setAttribute("data-msdb-value", listValue.join(";") + (!listValue.length || !this.get("multiple") ? "" : ";"));
+				target.setAttribute("data-msdb-value", listValue.join(";") + (!listValue.length || !this.get("multiple", null, 0) ? "" : ";"));
 
 			},
 
@@ -1884,93 +1715,144 @@
 			 * @memberof MSelectDBox
 			 * */
 			"select" : function(arg){
+				var selectedIds = this.getSelectedKeys();
+
+				this._select(arg);
+
+				this.applySelectedToList(
+					this._getItemsByID(
+						selectedIds.concat(this.getSelectedKeys())
+					)
+				);
+				this.applySelectedToInput();
+			},
+
+
+			_select: function(arg) {
 				if (typeof arg != "object" || $.isArray(arg)) return;
 
 				var value, key, blank = true;
 
-				if (typeof arg.blank != "undefined") blank = Boolean(arg.blank);
+				if (arg.blank) blank = !!arg.blank;
 
-				if (arg.id){
-					if (  !isNaN(arg.id) || $.isArray(arg.id)  ){
-						this._selectByID(parseInt(arg.id));
-						return;
-					}
+				if (  !isNaN(arg.id) || $.isArray(arg.id)  ){
+					this._selectByID(arg.id, 1);
+					return;
 				}
 
 				if (arg.value) {
 					value = arg.value;
 					key = "value";
+
 				} else if (arg.label) {
 					value = arg.label;
 					key = "label";
+
 				} else {
 					return;
 				}
 
 				if (  $.inArray(typeof value, ["number", "string"]) > -1  ) {
 					value = [value];
-				} else if (
-					typeof value == "object"
-					&& $.isArray(value)
-				) {
 
-				} else {
+				} else if (  !(typeof value == "object" && $.isArray(value))  ) {
 					return null;
 				}
 
-				if (!this.get("multiple") && value.length > 1) return null;
+				if (!this.get("multiple", null, 0) && value.length > 1) return null;
 
-				var list = this.get("list");
+				if (key == "value") this._selectByValue(value, blank);
+				else if (key == "label") this._selectByLabel(value, blank);
+			},
 
-				for(var c=0, L=list.length; c<L; c++){
-					if (  $.inArray(list[c][key], value) > -1  ){
-						list[c].selected = true;
 
-					} else if ( blank ) {
-						list[c].selected = false;
+			_selectByValue: function(value, reset) {
+				reset && this._deselectAll();
 
-					}
+				var c, valuesCache = this.get("valuesCache", null, 0);
+				var selectedCache = this.get("selectedCache", null, 0);
+
+				for (c=0; c<value.length; c++) {
+					if (!this.fx.hop(valuesCache, value[c])) continue;
+					valuesCache[value[c]].selected = true;
+					selectedCache[valuesCache[value[c]].id] = valuesCache[value[c]];
+				}
+			},
+
+
+			_selectByLabel: function(label, reset) {
+				reset && this._deselectAll();
+
+				var c, labelsCache = this.get("labelsCache");
+				var selectedCache = this.get("selectedCache", null, 0);
+
+				for (c=0; c<label.length; c++) {
+					if (!this.fx.hop(labelsCache, label[c])) continue;
+					labelsCache[label[c]].selected = true;
+					selectedCache[labelsCache[label[c]].id] = labelsCache[label[c]];
+				}
+			},
+
+
+			_getItemsByID: function(ids) {
+				var c, obj = Object.create(null),
+					list = this.get("list", null, 0);
+
+				for (c=0; c<ids.length; c++) {
+					obj[ids[c]] = list[ids[c]];
 				}
 
-				this.applySelectedToList();
-				this.applySelectedToInput();
-
+				return obj;
 			},
+
+
+			_getNextAvailItem: function(item) {
+				if (!item.next) return;
+
+				if (  item.next.elem.className.match(/m-select-d-box__list-item_hidden/i)  )
+					return this._getNextAvailItem(item.next);
+
+				return item.next;
+			},
+
+
+			_getPrevAvailItem: function(item) {
+				if (!item.prev) return;
+
+				if (  item.prev.elem.className.match(/m-select-d-box__list-item_hidden/i)  )
+					return this._getPrevAvailItem(item.prev);
+
+				return item.prev;
+			},
+
 
 			/**
 			 * @description Выделяет пункт из списка по ключу. Каждый раз определяет новую выборку.
 			 * @memberof MSelectDBox
 			 * @ignore
 			 * */
-			"_selectByID": function(arg){
-				var c;
-
+			"_selectByID": function(arg, reset){
 				if (  !isNaN(arg)  ){
-					arg = [parseInt(arg)];
-				} else if (  $.isArray(arg)  ) {
+					arg = [arg];
 
-				} else {
+				} else if (  !$.isArray(arg) || !arg.length  ) {
 					return;
 				}
 
-				var list = this.get("list");
+				var c, list = this.get("list", null, 0);
+				var cache = this.get("selectedCache", null, 0);
 
-				for(c=0; c<list.length; c++){
-					list[c].selected = false;
-				}
+				reset && this._deselectAll();
 
-				for(c=0; c<arg.length; c++){
+				for(c=0; c<arg.length; c++) {
 					if (isNaN(arg[c])) continue;
 					if (  !list.hasOwnProperty(arg[c])  ) continue;
+
 					list[arg[c]].selected = true;
+					cache[arg[c]] = list[arg[c]];
 				}
-
-				if (arg.length) {
-					this.applySelectedToInput();
-					this.applySelectedToList();
-				}
-
 			},
+
 
 			/**
 			 * @description Сниманиет выделение только с указанной выборки, не затрагивая остальные
@@ -1978,27 +1860,22 @@
 			 * @ignore
 			 * */
 			"_deselectByID": function(arg){
-				var c;
-
 				if (  !isNaN(arg)  ){
 					arg = [parseInt(arg)];
-				} else if (  $.isArray(arg)  ) {
 
-				} else {
+				} else if (  !$.isArray(arg) || !arg.length  ) {
 					return;
 				}
 
-				var list = this.get("list");
+				var c, list = this.get("list", null, 0);
+				var cache = this.get("selectedCache", null, 0);
 
 				for(c=0; c<arg.length; c++){
 					if (isNaN(arg[c])) continue;
 					if (  !list.hasOwnProperty(arg[c])  ) continue;
-					list[arg[c]].selected = false;
-				}
 
-				if (arg.length) {
-					this.applySelectedToInput();
-					this.applySelectedToList();
+					list[arg[c]].selected = false;
+					delete cache[arg[c]];
 				}
 			},
 
@@ -2011,7 +1888,7 @@
 				if (typeof filters == "function") filters = [filters];
 				if (!$.isArray(filters)) return false;
 				for(var c=0; c<filters.length; c++){
-					if (  filters[c].apply(this, [matcherStr, matchedStr])  ){
+					if (  filters[c].call(this, matcherStr, matchedStr)  ){
 						return true;
 					}
 				}
@@ -2072,26 +1949,24 @@
 			},
 
 
-			"_hideItems": function(){},
-
-
-			"_unhideItems": function(){},
-
-
 			/**
 			 * @description Deselect all options in list
 			 * @memberof MSelectDBox
 			 * */
 			"deselectAll" : function(){
-
-				var list = this.get("list");
-
-				for (var c = 0, L = list.length; c < L; c++) {
-					list[c].selected = false;
-				}
+				this._deselectAll();
 				this.applySelectedToList();
 				this.applySelectedToInput();
+			},
 
+
+			"_deselectAll": function() {
+				var cache = this.get("selectedCache", null, 0);
+
+				for (var c in cache) {
+					cache[c].selected = false;
+					delete cache[c];
+				}
 			},
 
 
@@ -2100,17 +1975,16 @@
 			 * @memberof MSelectDBox
 			 * */
 			"selectAll" : function(){
-				var list = this.get("list");
+				if (!this.get("multiple", null, 0)) return;
 
-				if (this.get("multiple")) {
-					for (var c = 0, L = list.length; c < L; c++) {
-						list[c].selected = true;
-					}
-					this.applySelectedToList();
-					this.applySelectedToInput();
-				} else {
-					return null;
+				var c, list = this.get("list", null, 0);
+
+				for (c = 0; c < list.length; c++) {
+					list[c].selected = true;
 				}
+
+				this.applySelectedToList();
+				this.applySelectedToInput();
 			},
 
 
@@ -2126,13 +2000,11 @@
 
 
 			"reInitList": function(){
-
-				var dbox = this.get("dbox", null, null);
+				var dbox = this.get("dbox", null, 0);
 
 				$("ul",dbox).detach();
 
 				this._initList();
-
 			},
 
 
@@ -2141,7 +2013,7 @@
 			 * @memberof MSelectDBox
 			 * */
 			"close" : function(){
-				var dbox = this.get("dbox", null, null);
+				var dbox = this.get("dbox", null, 0);
 				$(dbox).addClass("m-select-d-box_hidden");
 				this._closeFade();
 			},
@@ -2152,11 +2024,11 @@
 			 * @memberof MSelectDBox
 			 * */
 			"open" : function(){
-				var dbox = this.get("dbox", null, null);
+				var dbox = this.get("dbox", null, 0);
 				$(dbox).removeClass("m-select-d-box_hidden");
 				this.calcPosition();
 				this._openFade();
-				this._applyLang(this.get("language", null, null));
+				this._applyLang(this.get("language", null, 0));
 				if (  this._isMobileState()  ) this.get("dbox_input").focus();
 			},
 
@@ -2236,48 +2108,30 @@
 					return s.split(d[0]);
 				},
 
-				"trim" : function(str,_chars,_mode){
-					str = str.split('');
+				"trim" : function(str, ch, di) {
+					var regEx = [];
 
-					if ( typeof _chars == "string" ){
-						_chars = _chars.split('');
-					} else if ( typeof _chars == "object" && typeof _chars.push != "undefined" ){
+					if (!di || di == "left")
+						regEx.push("^[" + ch + "]+");
 
-					} else {
-						return str.join('');
-					}
+					if (!di || di == "right")
+						regEx.push("[" + ch + "]+$");
 
-					if ( typeof _mode == "undefined" ) _mode = 'both';
-
-					if ( _mode == 'both' ){
-						for(;;){
-							if ( !str.length || !($.inArray(str[0], _chars) != -1 || $.inArray(str[str.length-1], _chars) != -1) ) break;
-							if ($.inArray(str[str.length-1], _chars) != -1 ) str.pop();
-							if ($.inArray(str[0], _chars) != -1 ) str.shift();
-						}
-					}
-
-					if ( _mode == 'left' ){
-						for(;;){
-							if ( !str.length || $.inArray(str[0], _chars) == -1 ) break;
-							str.shift();
-						}
-					}
-
-					if ( _mode == 'right' ){
-						for(;;){
-							if ( !str.length || $.inArray(str[str.length-1], _chars) == -1 ) break;
-							str.pop();
-						}
-					}
-
-					return str.join('');
+					return str.replace(new RegExp(regEx.join("|"), "g"), '');
 				},
 
 				"rest": function(arr, n){
 					if (typeof arr != "object") return [];
 					if (typeof n != "number") return [];
 					return Array.prototype.slice.call(arr, n);
+				},
+
+				// hasOwnProperty
+				"hop": function(obj, prop) {
+					if ("hasOwnProperty" in obj) {
+						return Object.prototype.hasOwnProperty.call(obj, prop);
+					}
+					return prop in obj;
 				}
 			}
 		};
