@@ -133,7 +133,7 @@
 					"list": (function(){
 						var arr = [];
 						var counter = 0;
-						for(var c=0; c<100; c++){
+						for(var c=0; c<9000; c++){
 							arr.push(counter += Math.round(Math.random() * 99) * 10);
 						}
 						return arr;
@@ -249,7 +249,7 @@
 		<table class="form-table form-table_sep" style="width:420px;">
 
 			<tr>
-				<td style="width:256px;">multiple = false,<br />autoComplete = true</td>
+				<td style="width:256px;">multiple = false,<br />autoComplete = true<br />list.length = 9000</td>
 				<td>
 					<label>
 						<input id="msdb-a" class="std-input" type="text">
