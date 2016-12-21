@@ -8,10 +8,12 @@ Features
 - Custom function of autocomplete filter. Example: correction of keyboard language layout
 - Could be attached to any target element
 - Adapted for portable devices
+- API propose the possibility to customize control ([demo](https://eugenegantz.github.io/MSelectDialogBox/example.html))
 
-####[Demo](https://eugenegantz.github.io/MSelectDialogBox/example.html)####
-####[Download MSelectDialogBox.js](https://raw.githubusercontent.com/eugenegantz/MSelectDialogBox/master/js/MSelectDBox.js)####
-####[Download MSelectDBox.min.js](https://raw.githubusercontent.com/eugenegantz/MSelectDialogBox/master/js/MSelectDBox.min.js)####
+####[Demo](https://eugenegantz.github.io/MSelectDialogBox/examples/example-1.html)####
+####[Download MSelectDialogBox.js](https://raw.githubusercontent.com/eugenegantz/MSelectDialogBox/master/dist/m-select-d-box.js)####
+####[Download MSelectDBox.min.js](https://raw.githubusercontent.com/eugenegantz/MSelectDialogBox/master/dist/m-select-d-box.min.js)####
+####[JSDoc documentation (detailed API)](https://github.com/eugenegantz/MSelectDialogBox/blob/master/docs/m-select-d-box.md)####
 ####[Документация на русском](https://github.com/eugenegantz/MSelectDialogBox/blob/master/README.ru.md)####
 
 Example
@@ -66,7 +68,7 @@ $("#selector").mSelectDBox(
     ]
 );
 ~~~~~
-	
+
 * [Boolean] `multiple` - enable or disable multiple selection of items in list.
 Default: false.
 
@@ -84,8 +86,16 @@ Default: `[$.prototype.mSelectDBox.prototype.defaultOptionFilters.default]`
 
 * [Boolean] `embeddedInput` - activates search input inside listbox
 
+* [String] `width` - width of list box. Example: `"10px"` or `"auto"`
+
+* [Number] `zIndex` - `z-index` style property of list box
+
+* [String] `language` - set language of instance (en | ru)
+
 Events
 ----------------------------------
+* `init` - fires when instance initialized
+
 * `onselect` - fires when list item is selected
 
 * `onchange` - fires when text input was changed
@@ -210,7 +220,7 @@ Texts codes:
 
 Methods
 ----------------------------------
-####getInstances####
+###.getInstances()###
 `getInstances([Object] arg)` — search initialized instances by name.
 Return array of matched instances.
 
@@ -231,7 +241,7 @@ var dbox = $.prototype.mSelectDBox.prototype.getInstances({"name":"instanceName"
 dbox.method(...);
 ```
 
-####trigger####
+###.trigger()###
 `trigger([String] eventName)`, `.("trigger", [String] eventName)` — fire predefined event.
 
 Example:
@@ -245,7 +255,7 @@ Alternative:
 $("#selector").mSelectDBox("trigger","select");
 ~~~~~
 
-####on####
+###.on()###
 `on([String] eventName, [Function] callback)`, `.("on", [String] eventName, [Function] callback)` — add custom event listener.
 
 Example:
@@ -270,8 +280,8 @@ $("#selector").mSelectDBox(
 );
 ~~~~~
 
-####select####
-`select([Object] arg)`,`.("select", [Object] arg)` — select list items by value or label.
+###.select()###
+`select([Object] arg)`,`.("select", [Object] arg)` — select list options by value, label or id (key)
 
 `arg = {"label": Array | String};`
 
@@ -292,7 +302,7 @@ Alternative:
 $("#selector").mSelectDBox("select",{"label": ["100", "200"]});
 ~~~~~
 
-####getSelectedLabels####
+###.getSelectedLabels()###
 Return array of selected list labels
 ~~~~~ javascript
 var array = $("#selector").mSelectDBox("getSelectedLabels");
@@ -303,7 +313,7 @@ Alternative:
 var array = $("#selector").mSelectDBox().getSelectedLabels();
 ~~~~~
 
-####getSelectedValues####
+###.getSelectedValues()###
 Return array of selected list values
 ~~~~~ javascript
 var array = $("#selector").mSelectDBox("getSelectedValues");
@@ -314,30 +324,28 @@ Alternative:
 var array = $("#selector").mSelectDBox().getSelectedValues();
 ~~~~~
 
-####selectAll####
-`selectAll(void)` — select all list items. Only if multiple = true.
+###.selectAll()###
+`selectAll(void)` — select all list options. Only if multiple = true
 
-####deselectAll####
+###.deselectAll()###
 `deselectAll(void)`
 
-####open####
-`open(void)` — show list box.
+###.open()###
+`open(void)` — show list box
 
-####close####
-`close(void)` — hide list box.
+###.close()###
+`close(void)` — hide list box
 
-####isActive####
-`isActive(void)` — return true if list box is visible.
+###.isActive()###
+`isActive(void)` — return true if list box is visible
 
-####get####
+###.get()###
 `get([String] key)` — returns property of MSelectDBox instance
 
-####set####
+###.set()###
 `set([String] key, [Any] value)` — set new or update property of MSelectDBox instance
 
 TODO
 --------------------------------------
-- Custom events type
 - Groups
-- Changeable appearance
 - README.MD

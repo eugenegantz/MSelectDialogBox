@@ -1,8 +1,6 @@
-module.exports = function(grunt){
+module.exports = function(grunt) {
 
 	grunt.initConfig({
-
-
 		uglify: {
 			main: {
 				options: {
@@ -14,40 +12,43 @@ module.exports = function(grunt){
 					*/
 				},
 				files: {
-					'./js/MSelectDBox.min.js': ['./js/MSelectDBox.js']
+					'./dist/m-select-d-box.min.js': ['./dist/m-select-d-box.js']
 				}
 			}
 		},
-
 
 		jsdoc : {
 			dist : {
-				src: "./js/MSelectDBox.js",
+				src: "./dist/m-select-d-box.js",
 				options: {
-					destination: "./docs/"
+					destination: "./docs/",
+					configure: "./docs/jsdoc.json"
 				}
 			}
 		},
-
 
 		jsdox: {
 			generate: {
 				options: {
-					contentsTitle: 'MSelectDBox Documentation'
+					contentsTitle: 'm-select-d-box documentation'
 				},
-
-				src: "./js/MSelectDBox.js",
-				dest: './docs/'
+				src: "./dist/m-select-d-box.js",
+				dest: './docs-jsdox/'
 			}
 		}
-
-
 	});
 
 	grunt.loadNpmTasks('grunt-contrib-uglify');
-	grunt.loadNpmTasks('grunt-jsdox');
+	// grunt.loadNpmTasks('grunt-jsdox');
 	grunt.loadNpmTasks('grunt-jsdoc');
 
-	grunt.registerTask('default', ['uglify', 'jsdox', 'jsdoc']);
+	grunt.registerTask(
+		'default',
+		[
+			'uglify',
+			// 'jsdox',
+			'jsdoc'
+		]
+	);
 
 };

@@ -3,9 +3,7 @@
 *.7z
 .idea
 /js/showdown.min.js
-/test
 /out
-/docs
 *.bat
 README.ru.html
 README.html

@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title></title>
+	<link type="text/css"  href="./../lib/mocha/mocha.css" rel="stylesheet">
+	<script type="application/javascript" src="./../lib/mocha/mocha.js"></script>
+	<script type="application/javascript" src="./../lib/chai/chai.js"></script>
+	<script type="application/javascript" src="./../lib/jquery/jquery-2.2.2.min.js"></script>
+	<script type="application/javascript" src="./../dist/m-select-d-box.js"></script>
+	<script type="application/javascript">
+		mocha.ui('bdd'); // 2
+		mocha.reporter('html'); // 3
+		var assert = chai.assert; // 4
+		assert.ok = assert.isOk;
+	</script>
+	<script type="application/javascript" src="spec.js"></script>
+	<script type="application/javascript">
+		document.addEventListener("DOMContentLoaded", function(){
+			mocha.run();
+		}, false);
+	</script>
+</head>
+<body>
+	<div id="mocha"></div>
+</body>
+</html>
