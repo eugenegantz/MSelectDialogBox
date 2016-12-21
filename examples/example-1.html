@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<title>MultiSelect Dialog Box</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+		<link rel="stylesheet" type="text/css" href="./styles/css/example-1.css">
+		<script type="application/javascript" src="./../lib/jquery/jquery-2.2.2.min.js"></script>
+		<script type="application/javascript" src="./../dist/m-select-d-box.js"></script>
+		<script type="application/javascript" src="./js/ex-1-custom-appear.js"></script>
+		<script type="application/javascript" src="./js/example-1.js"></script>
+	</head>
+	<body>
+
+	<!--
+	<div style="width:100%; height:100%; top:0; left:0; background-color: rgba(0, 0, 0, 0.2); pointer-events: none; position: fixed;"></div>
+	-->
+
+	<div class="std-plate std-plate_thick-pad std-plate_rounded" style="display:inline-block;">
+		<table class="form-table form-table_sep" style="width:420px;">
+
+			<tr>
+				<td style="width:256px;">multiple = false,<br />autoComplete = true<br />list.length = 9000</td>
+				<td>
+					<label>
+						<input id="msdb-a" class="std-input" type="text">
+					</label>
+				</td>
+			</tr>
+
+			<tr>
+				<td>multiple = true,<br />autoComplete = true</td>
+				<td>
+					<label>
+						<input id="msdb-b" class="std-input" type="text">
+					</label>
+				</td>
+			</tr>
+
+			<tr>
+				<td>
+					<div>
+						multiple = true,<br />autoComplete = true,<br />optionFilters=[default, russianKeyboard]
+					</div>
+					<div class="note">
+						Searches Cyrillic text correcting the Latin keyboard layout
+					</div>
+				</td>
+				<td>
+					<label>
+						<input id="msdb-c" class="std-input" type="text">
+					</label>
+				</td>
+			</tr>
+
+			<tr>
+				<td>
+					<div>multiple = false,<br />autoComplete = true,<br />optionFilters=[matchLeft]</div>
+					<div class="note">
+						Select only those items that match the beginning of the line
+					</div>
+				</td>
+				<td>
+					<label>
+						<input id="msdb-e" class="std-input" type="text">
+					</label>
+				</td>
+			</tr>
+
+			<tr>
+				<td>multiple = true</td>
+				<td>
+					<label>
+						<input type="button" id="msdb-d" class="std-button" value="Select options">
+					</label>
+				</td>
+			</tr>
+
+			<tr>
+				<td>multiple = true,<br />embeddedInput = true<br />language = en</td>
+				<td>
+					<label>
+						<input type="button" id="msdb-f" class="std-button" value="Select options">
+					</label>
+				</td>
+			</tr>
+
+			<tr>
+				<td>
+					multiple = true,
+					<br />autoComplete = true
+					<br />custom appearance
+					<br /><a href="./js/ex-1-custom-appear.js">download js example</a>
+				</td>
+				<td>
+					<input type="button" id="msdb-0" class="" value="Select options" style="width:100%;">
+				</td>
+			</tr>
+
+		</table>
+	</div>
+	<br />
+	<div class="std-plate std-plate_thick-pad std-plate_rounded events-plate" style="display:inline-block; width:256px;"></div>
+
+	</body>
+</html>
