@@ -2483,7 +2483,7 @@
 					return this.mSelectDBox().select({ value: value }) && this;
 				}
 
-				return jQueryValFn.apply(arguments);
+				return jQueryValFn.apply(this, arguments);
 			},
 
 			"mSelectDBox":  function(arg) {
