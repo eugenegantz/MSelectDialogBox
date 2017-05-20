@@ -274,7 +274,7 @@
 						}
 
 					}
-				}, 500);
+				}, self.get("autoCompleteTimeoutDelay", null, !1));
 			},
 
 
@@ -532,7 +532,7 @@
 								function() {
 									self.close();
 								},
-								250
+								self.get("focusOutInputsTimeoutDelay", null, !1)
 							);
 							return;
 						}
@@ -970,7 +970,7 @@
 					{ "key": "freeWrite",        "type": "any",      "into": "boolean" }
 				];
 
-				for (c=0; c<allowedKeys.length; c++) {
+				for (c = 0; c < allowedKeys.length; c++) {
 					allowedKeys[c].key = allowedKeys[c].key.toLowerCase();
 					if (  "default" in allowedKeys[c]  ) {
 						defaultProps[allowedKeys[c].key] = allowedKeys[c].default;
@@ -1286,6 +1286,9 @@
 
 				// --------------------------------------------------------------------------------
 				// Таймеры
+
+				this.set("autoCompleteTimeoutDelay", 500, null, false);
+				this.set("focusOutInputsTimeoutDelay", 250, null, false);
 
 				this._timers = Object.create(null);
 				this._timers.autoComplete = null;
@@ -1856,7 +1859,7 @@
 			 * @return {MSelectDBox}
 			 * */
 			"hideItem": function(item) {
-				item.$elem.addClass("m-select-d-box__list-item_hidden");
+				item && item.$elem.addClass("m-select-d-box__list-item_hidden");
 
 				return this;
 			},
@@ -1868,7 +1871,7 @@
 			 * @return {MSelectDBox}
 			 * */
 			"unhideItem": function(item) {
-				item.$elem.removeClass("m-select-d-box__list-item_hidden");
+				item && item.$elem.removeClass("m-select-d-box__list-item_hidden");
 
 				return this;
 			},
@@ -1890,7 +1893,7 @@
 			 * @return {Boolean}
 			 * */
 			"isVisibleItem": function(item) {
-				return !item.$elem.hasClass("m-select-d-box__list-item_hidden");
+				return !!item && !item.$elem.hasClass("m-select-d-box__list-item_hidden");
 			},
 
 
@@ -1900,6 +1903,9 @@
 			 * @return {MSelectDBox}
 			 * */
 			"hoverItem": function(item) {
+				if (!item)
+					return this;
+
 				var cache = this.get("hoveredCache", null, !1);
 
 				item.isHovered = true;
@@ -1916,6 +1922,9 @@
 			 * @return {MSelectDBox}
 			 * */
 			"unhoverItem": function(item) {
+				if (!item)
+					return this;
+
 				var cache = this.get("hoveredCache", null, !1);
 
 				item.isHovered = false;
@@ -1982,7 +1991,7 @@
 			 * @return {Object | undefined}
 			 * */
 			"getNextVisibleItem": function(item) {
-				if (!item.next) return;
+				if (!item || !item.next) return;
 
 				if (!this.isVisibleItem(item.next))
 					return this.getNextVisibleItem(item.next);
@@ -1997,7 +2006,7 @@
 			 * @return {Object | undefined}
 			 * */
 			"getPrevVisibleItem": function(item) {
-				if (!item.prev) return;
+				if (!item || !item.prev) return;
 
 				if (!this.isVisibleItem(item.prev))
 					return this.getPrevVisibleItem(item.prev);
@@ -2012,6 +2021,8 @@
 			 * @return {Object}
 			 * */
 			"selectNextVisibleItem": function(item) {
+				if (!item) return;
+
 				var selected = this.getSelectedItems();
 
 				item = this.getNextVisibleItem(item);
@@ -2032,6 +2043,8 @@
 			 * @return {Object}
 			 * */
 			"selectPrevVisibleItem": function(item) {
+				if (!item) return;
+
 				var selected = this.getSelectedItems();
 
 				item = this.getPrevVisibleItem(item);
@@ -2053,7 +2066,7 @@
 			"getLastVisibleItem": function() {
 				var item = this.get("lastItem", null, !1);
 
-				return (!this.isVisibleItem(item) && this.getPrevVisibleItem(item)) || item;
+				return (this.isVisibleItem(item) && item) || this.getPrevVisibleItem(item);
 			},
 
 
@@ -2064,7 +2077,7 @@
 			"getFirstVisibleItem": function() {
 				var item = this.get("firstItem", null, !1);
 
-				return (!this.isVisibleItem(item) && this.getNextVisibleItem(item)) || item;
+				return (this.isVisibleItem(item) && item) || this.getNextVisibleItem(item);
 			},
 
 
