@@ -12,10 +12,10 @@
 - Подписи на двух языках (Английский, Русский).
 Возможность переопределять подписи на встроенных языках и доопределять подписи для других языков.
 
-####[Демо](https://eugenegantz.github.io/MSelectDialogBox/examples/example-1.html)####
-####[Скачать MSelectDialogBox.js](https://raw.githubusercontent.com/eugenegantz/MSelectDialogBox/master/dist/m-select-d-box.js)####
-####[Скачать MSelectDBox.min.js](https://raw.githubusercontent.com/eugenegantz/MSelectDialogBox/master/dist/m-select-d-box.min.js)####
-####[JSDoc документация (подробное API)](https://github.com/eugenegantz/MSelectDialogBox/blob/master/docs/m-select-d-box.md)####
+#### [Демо](https://eugenegantz.github.io/MSelectDialogBox/examples/example-1.html) ####
+#### [Скачать MSelectDialogBox.js](https://raw.githubusercontent.com/eugenegantz/MSelectDialogBox/master/dist/m-select-d-box.js) ####
+#### [Скачать MSelectDBox.min.js](https://raw.githubusercontent.com/eugenegantz/MSelectDialogBox/master/dist/m-select-d-box.min.js) ####
+#### [JSDoc документация (подробное API)](https://github.com/eugenegantz/MSelectDialogBox/blob/master/docs/m-select-d-box.md) ####
 
 Пример
 ----------------------------------
@@ -227,7 +227,7 @@ $("#selector").mSelectDBox({
 
 Методы
 ----------------------------------
-###.getInstances()###
+### .getInstances() ###
 `getInstances([Object] arg)` — поиск по имени инициализированных экземпляров списка.
 Возвращает массив подходящих экземпляров списка.
 
@@ -252,7 +252,7 @@ dbox.method(...);
 $("#selector").mSelectDBox("method", ...);
 ```
 
-###.on()###
+### .on() ###
 `on([String] eventName, [Function] callback)`, `.("on", [String] eventName, [Function] callback)` — устанавливает событие с указанным именем.
 
 Пример:
@@ -277,7 +277,7 @@ $("#selector").mSelectDBox(
 );
 ~~~~~
 
-###.trigger()###
+### .trigger() ###
 `trigger([String] eventName)`, `.("trigger", [String] eventName)` — запускает указанное событие. (Если оно разумеется заранее установлено)
 
 Пример:
@@ -291,7 +291,7 @@ dbox.trigger("select");
 $("#selector").mSelectDBox("trigger","select");
 ~~~~~
 
-###.select()###
+### .select() ###
 `select([Object] arg)`, `.("select", [Object] arg)` — выделяет из списка элемент по указанному имени или значению.
 
 `arg = {"label": Array|String};` или `arg = {"value": Array|String};`
@@ -309,7 +309,7 @@ dbox.select({"value": "0"});
 $("#selector").mSelectDBox("select",{"label": ["100", "200"]});
 ~~~~~
 
-###.getSelectedLabels()###
+### .getSelectedLabels() ###
 Возвращает массив названий (label) выбранных элементов списка
 ~~~~~ javascript
 var array = $("#selector").mSelectDBox("getSelectedLabels");
@@ -320,7 +320,7 @@ var array = $("#selector").mSelectDBox("getSelectedLabels");
 var array = $("#selector").mSelectDBox().getSelectedLabels();
 ~~~~~
 
-###.getSelectedValues()###
+### .getSelectedValues() ###
 Возвращает массив значений (value) выбранных элементов списка
 ~~~~~ javascript
 var array = $("#selector").mSelectDBox("getSelectedValues");
@@ -331,25 +331,25 @@ var array = $("#selector").mSelectDBox("getSelectedValues");
 var array = $("#selector").mSelectDBox().getSelectedValues();
 ~~~~~
 
-###.selectAll()###
+### .selectAll() ###
 `selectAll(void)` — выбрать все элементы из списка. Только если multiple = true.
 
-###.deselectAll()###
+### .deselectAll() ###
 `deselectAll(void)`
 
-###.open()###
+### .open() ###
 `open(void)` — показать список.
 
-###.close()###
+### .close() ###
 `close(void)` — скрыть список.
 
-###.isActive()###
+### .isActive() ###
 `isActive(void)` — возвращает true если список активен (не скрыт).
 
-###.get()###
+### .get() ###
 `get([String] key)` — получить свойство экземпляра MSelectDBox (в том числе параметры конструктора)
 
-###.set()###
+### .set() ###
 `set([String] key, [Any] value)` — обновить, устанавить новое свойство экземпляра MSelectDBox
 
 TODO
