@@ -106,6 +106,10 @@ Events
 
 * `input:empty` - fires when text input become empty
 
+* `autocomplete:empty` - fires when autocomplete function results empty list
+
+* `autocomplete:not-empty` - fires when autocomplete function results not empty list
+
 * `focus` - you know... focus
 
 * `focusout` - same as blur

@@ -520,8 +520,8 @@
 					self._eventDefaultInputEmpty
 				);
 
-				this.on("focus", self._eventFocus);
-				this.on("click", self._eventFocus);
+				this.on("focus", self._eventFocus.bind(self));
+				this.on("click", self._eventFocus.bind(self));
 
 				this.on(
 					"focusout",
@@ -1053,6 +1053,7 @@
 					"firstItem": void 0,
 					"lastItem": void 0,
 					"hoveredCache": Object.create(null),
+					"hiddenCache": Object.create(null),
 					"selectedCache": Object.create(null),
 					"valuesCache": Object.create(null),
 					"labelsCache": Object.create(null)
@@ -1859,7 +1860,13 @@
 			 * @return {MSelectDBox}
 			 * */
 			"hideItem": function(item) {
-				item && item.$elem.addClass("m-select-d-box__list-item_hidden");
+				if (item) {
+					var cache = this.get("hiddenCache", null, !1);
+
+					cache[item.value] = item;
+
+					item.$elem.addClass("m-select-d-box__list-item_hidden");
+				}
 
 				return this;
 			},
@@ -1871,7 +1878,13 @@
 			 * @return {MSelectDBox}
 			 * */
 			"unhideItem": function(item) {
-				item && item.$elem.removeClass("m-select-d-box__list-item_hidden");
+				if (item) {
+					var cache = this.get("hiddenCache", null, !1);
+
+					delete cache[item.value];
+
+					item.$elem.removeClass("m-select-d-box__list-item_hidden");
+				}
 
 				return this;
 			},
@@ -1881,9 +1894,11 @@
 			 * Make visible all list options
 			 * */
 			"unhideAllItems": function() {
-				$(this.get("dbox"))
-					.find(".m-select-d-box__list-item_hidden")
-					.removeClass("m-select-d-box__list-item_hidden");
+				var cache = this.get("hiddenCache", null, !1);
+
+				Object.keys(cache).forEach(function(k) {
+					this.unhideItem(cache[k]);
+				}, this);
 			},
 
 
@@ -2199,18 +2214,17 @@
 			 * @return MSelectDBox
 			 * */
 			"applyAutoComplete": function(value) {
-				var list = this.get("list", null, !1);
+				var list = this.get("list", null, !1),
+					listKeys = Object.keys(list),
+					hiddenCache = this.get("hiddenCache", null, !1),
+					optFilters = this.get("optionFilters", null, !1);
 
 				if (!value) {
 					this.unhideAllOpt();
 
 				} else {
-					Object.keys(list).forEach(function(c) {
-						if (
-							!this._optionFiltersMatcher(
-								this.get("optionFilters", null, !1), value, list[c].label
-							)
-						) {
+					listKeys.forEach(function(c) {
+						if (!this._optionFiltersMatcher(optFilters, value, list[c].label)) {
 							this.hideItem(list[c]);
 
 						} else {
@@ -2218,6 +2232,10 @@
 						}
 					}, this);
 				}
+
+				Object.keys(hiddenCache).length == listKeys.length
+					? this.trigger("autocomplete:empty")
+					: this.trigger("autocomplete:not-empty");
 
 				return this;
 			},

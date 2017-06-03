@@ -122,7 +122,13 @@ $(document).ready(function() {
 		"autoComplete": true,
 		"embeddedInput": true,
 		"language": "en"
-	});
+	}).on(
+		"autocomplete:empty",
+		eventLog
+	).on(
+		"autocomplete:not-empty",
+		eventLog
+	);
 
 	$("#msdb-0").mSelectDBox({
 		"list": [
