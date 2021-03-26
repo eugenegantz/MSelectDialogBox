@@ -80,6 +80,8 @@ $("#selector").mSelectDBox(
 * [Boolean] `autoComplete` - вкл (true) или выкл (false) автопоиск по списку. Только если список прикреплен к текстовому \<input\> или \<textarea\>.
 По-умолчанию: false.
 
+* [Boolean] `openOnFocus` - вкл (true) или выкл (false) открытие выпадающего списка по событию onFocus на элементе.
+Default: true.
 
 * [String] `name` - используется для поиска по имени инициализированного экземпляра списка (см. методы).
 По-умолчанию: undefined.

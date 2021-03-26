@@ -1,12 +1,3 @@
-*.zip
-*.rar
-*.7z
+*.ignore.*
 .idea
-/js/showdown.min.js
-/out
-*.bat
-README.ru.html
-README.html
 node_modules
-example2.html
-server.js

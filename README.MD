@@ -76,6 +76,9 @@ Default: false.
 * [Boolean] `autoComplete` - enable or disable auto compelete. Only if target element is text input or textarea.
 Default: false.
 
+* [Boolean] `openOnFocus` - enable or disable auto open of list box on focus event.
+Default: true.
+
 
 * [String] `name` - name of instance. Used for search initialized instance by name.
 Default: undefined

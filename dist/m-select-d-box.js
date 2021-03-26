@@ -16,6 +16,7 @@
 		 * @param {Boolean}             arg.freeWrite
 		 * @param {String}              arg.language - language of instance
 		 * @param {Boolean}             arg.embeddedInput - show text input in list container
+		 * @param {Boolean=true}        arg.openOnFocus. true by default
 		 **/
 		var MSelectDBox = function(arg) {
 			this.init(arg);
@@ -214,8 +215,6 @@
 					target                  = self.get("target", null, !1),
 					dboxInput               = self.get("dbox_input", null, !1),
 					keyCode                 = e.keyCode,
-					list                    = self.get("list", null, !1),
-					dbox                    = self.get("dbox", null, !1),
 					contextElement          = e.currentTarget,
 					serviceKeyCodes         = [37,38,39,40,9,13,18,17,16,20,27];
 
@@ -287,22 +286,25 @@
 				// Если список без множественного выделения
 				if (  self.get("multiple", null, !1)  ) return; // close.if.!multiple
 
-				if (  $.inArray(e.keyCode, [37,39,9,18,17,16,20,27]) > -1  ) {
-					// left, right, tab, alt, ctrl, shift, caps, esc
+				if (  $.inArray(e.keyCode, [37,39,9,18,17,16,20]) > -1  ) {
+					// left, right, tab, alt, ctrl, shift, caps
 
 				} else if ( e.keyCode == 13 ) {
 					// 13 = Enter
 
 					if (  !self.isActive()  ) {
 						self.open();
-						self._eventFocus.call(target, self, e);
+						self._eventOpen.call(self, null, e);
 
 					} else {
 						self.close();
 					}
 
-				} else if (  $.inArray(e.keyCode, [38,39,40]) > -1 ) {
+				} else if (  27 == e.keyCode  ) {
+					// esc - закрыть
+					self.close();
 
+				} else if (  $.inArray(e.keyCode, [38,39,40]) > -1 ) {
 					// other keys
 
 					if (  !self.isActive()  ) return;
@@ -328,24 +330,27 @@
 					e.listItem = selected;
 
 					self.trigger("select", e);
-
-				} // close.if.keys in [38,39,40]
+				}
 			},
 
 
 			"_eventDefaultKeyDownMultipleTrue": function(e) {
 				var selectedIds,
 					self = this,
-					list = self.get("list", null, !1),
 					hovered = self.getHoveredItems()[0];
 
 				if (  self.get("multiple")  ) {
-					if (  $.inArray(e.keyCode, [37,39,9,18,17,16,20,27]) > -1  ) {
+					if (  $.inArray(e.keyCode, [37,39,9,18,17,16,20]) > -1  ) {
 						// left, right, tab, alt, ctrl, shift, caps, esc
 
 					} else if (e.keyCode == 13) {
 						// Enter
-						if (!hovered) return;
+
+						if (  !self.isActive()  )
+							self.open();
+
+						if (!hovered)
+							return;
 
 						selectedIds = self.getSelectedKeys();
 
@@ -363,6 +368,10 @@
 						self.trigger("select", e);
 
 						return;
+
+					}  else if (  27 == e.keyCode  ) {
+						// esc - закрыть
+						self.close();
 
 					} else if (e.keyCode == 38 || e.keyCode == 40) {
 						if (hovered) {
@@ -382,15 +391,26 @@
 			},
 
 
-			"_eventFocus": function(context,e) {
+			"_eventFocus": function(context, e) {
+				if (  this.get("openOnFocus")  ) {
+					this.open();
+					this._eventOpen(context, e);
+				}
+			},
+
+
+			"_eventClick": function(context, e) {
+				this.open();
+				this._eventOpen(context, e);
+			},
+
+
+			"_eventOpen": function(context, e) {
 				var c, value, msdb_value,
 					self            = this,
 					selectedIds     = self.getSelectedKeys(),
 					list            = self.get("list", null, !1),
-					dbox            = self.get("dbox", null, !1),
 					contextElement  = e.currentTarget || (this instanceof Element ? this : null);
-
-				self.open();
 
 				if (  self.fx.isTextInput(contextElement)  ) {
 					msdb_value = contextElement.getAttribute('data-msdb-value');
@@ -467,7 +487,6 @@
 
 			"_initEvents": function(arg) {
 				var eventName,
-					body = $("body").get(0),
 					self = this,
 					tmpEvents = {};
 
@@ -521,7 +540,7 @@
 				);
 
 				this.on("focus", self._eventFocus.bind(self));
-				this.on("click", self._eventFocus.bind(self));
+				this.on("click", self._eventClick.bind(self));
 
 				this.on(
 					"focusout",
@@ -967,6 +986,7 @@
 					{ "key": "optionFilters",    "type": "array" },
 					{ "key": "closeButton",      "type": "boolean" },
 					{ "key": "language",         "type": "string",   "default": this.detectLanguage() },
+					{ "key": "openOnFocus",      "type": "boolean",  "default": true },
 					{ "key": "freeWrite",        "type": "any",      "into": "boolean" }
 				];
 
@@ -1142,10 +1162,10 @@
 
 				var list = this.get("list", null, !1);
 
-				if (  !$.isArray(list)  ) {
-					this.set("list", [], null, false);
-					return false;
-				}
+				if (  !$.isArray(list)  )
+					list = [];
+
+				list = list.slice(0);
 
 				var c, listItem, prev,
 					labelCache = Object.create(null),
@@ -1255,7 +1275,7 @@
 				this.set("lastItem", list[list.length - 1], null, !1);
 				this.set("labelsCache", labelCache, null, !1);
 				this.set("valuesCache", valueCache, null, !1);
-
+				this.set("list", list, null, false);
 			},
 
 
@@ -2303,7 +2323,6 @@
 				this._initList();
 
 				var c, key,
-					list = this.get("list"),
 					selectedCache = this.get("selectedCache", null, !1),
 					valuesCache = this.get("valuesCache", null, !1),
 					labelsCache = this.get("labelsCache", null, !1),

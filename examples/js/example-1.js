@@ -16,6 +16,24 @@ $(document).ready(function() {
 	$.prototype.mSelectDBox.prototype._globalStyles[".m-select-d-box__list-item_selected:hover, .m-select-d-box__list-item_selected.m-select-d-box__list-item_hover"]["background-color"] = "green";
 	$.prototype.mSelectDBox.prototype._globalStyles[".m-select-d-box__list-item:active, .m-select-d-box__list-item_selected:active"]["background-color"] = "darkgreen";
 
+	var greeceAlphabet = [
+		"alpha", "beta", "gamma", "delta",
+		"epsilon", "zeta", "eta", "theta", "iota",
+		"kappa", "lambda", "mu", "nu", "xi",
+		"omicron", "pi", "rho", "sigma", "tau",
+		"upsilon", "phi", "chi", "psi", "omega"
+	];
+
+	var streetsOfBrokenLightsEng = [
+		"Petrenko (muhomor)",
+		"Larin",
+		"Abdulova",
+		"Dukalis",
+		"Kazantsev",
+		"Volkov",
+		"Solovets",
+		"Cherdyntsev"
+	];
 
 	$("#msdb-a").mSelectDBox({
 		"list": (function() {
@@ -34,13 +52,7 @@ $(document).ready(function() {
 	});
 
 	$("#msdb-b").mSelectDBox({
-		"list": [
-			"alpha", "beta", "gamma", "delta",
-			"epsilon", "zeta", "eta", "theta", "iota",
-			"kappa", "lambda", "mu", "nu", "xi",
-			"omicron", "pi", "rho", "sigma", "tau",
-			"upsilon", "phi", "chi", "psi", "omega"
-		],
+		"list": greeceAlphabet,
 		"builtInInput": 0,
 		"multiple": true,
 		"autoComplete": true,
@@ -73,16 +85,7 @@ $(document).ready(function() {
 	});
 
 	$("#msdb-d").mSelectDBox({
-		"list": [
-			"Petrenko (muhomor)",
-			"Larin",
-			"Abdulova",
-			"Dukalis",
-			"Kazantsev",
-			"Volkov",
-			"Solovets",
-			"Cherdyntsev"
-		],
+		"list": streetsOfBrokenLightsEng,
 		"multiple": 1,
 		"name": "d",
 		"autoComplete": true
@@ -107,16 +110,7 @@ $(document).ready(function() {
 	});
 
 	$("#msdb-f").mSelectDBox({
-		"list": [
-			"Petrenko (muhomor)",
-			"Larin",
-			"Abdulova",
-			"Dukalis",
-			"Kazantsev",
-			"Volkov",
-			"Solovets",
-			"Cherdyntsev"
-		],
+		"list": streetsOfBrokenLightsEng,
 		"multiple": 1,
 		"name": "f",
 		"autoComplete": true,
@@ -131,17 +125,18 @@ $(document).ready(function() {
 	);
 
 	$("#msdb-0").mSelectDBox({
-		"list": [
-			"alpha", "beta", "gamma", "delta",
-			"epsilon", "zeta", "eta", "theta", "iota",
-			"kappa", "lambda", "mu", "nu", "xi",
-			"omicron", "pi", "rho", "sigma", "tau",
-			"upsilon", "phi", "chi", "psi", "omega"
-		],
+		"list": greeceAlphabet,
 		"multiple": 1,
 		"autoComplete": true,
 		"onInit": function(ctx) {
 			new $.fn.mSelectDBox.MyCustomAppear1(ctx);
 		}
+	});
+
+	$("#msdb-2").mSelectDBox({
+		"list": greeceAlphabet,
+		"multiple": false,
+		"openOnFocus": false,
+		"autoComplete": true
 	});
 });
