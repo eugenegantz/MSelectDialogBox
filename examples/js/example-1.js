@@ -51,6 +51,56 @@ $(document).ready(function() {
 		"name": "a"
 	});
 
+	var msdba2 = $("#msdb-a-2").mSelectDBox({
+		"list": (function() {
+			var arr = [];
+			var counter = 0;
+			for (var c = 0; c < 30; c++) {
+				arr.push(counter += Math.round(Math.random() * 99) * 10);
+			}
+			return arr;
+		})(),
+		"multiple": true,
+		"autoComplete": true,
+		"input:empty": eventLog,
+		"onselect": eventLog,
+		"name": "a2"
+	});
+
+	function _onChange(_this) {
+		var list = _this.get("list");
+		var selectedItems = _this.getSelectedItems();
+
+		if (selectedItems.length >= 3) {
+			list.forEach(function(item) {
+				if (!item.selected) {
+					_this.disableItem(item);
+				}
+			});
+
+		} else {
+			list.forEach(function(item) {
+				_this.enableItem(item);
+			});
+		}
+	}
+
+	msdba2.on("select", _onChange);
+
+	(function() {
+		var t = null;
+
+		msdba2.on("keydown", function(ctx, e) {
+			var _this = this;
+
+			clearTimeout(t);
+
+			t = setTimeout(function() {
+				_onChange.call(_this, ctx, e);
+			}, 1000);
+		});
+	})();
+
 	$("#msdb-b").mSelectDBox({
 		"list": greeceAlphabet,
 		"builtInInput": 0,

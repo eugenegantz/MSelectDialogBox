@@ -311,7 +311,7 @@
 
 					if (!selected) {
 						// ничего не выбрано - сделать шаг вверх начиная с первого
-						selected = self.selectPrevVisibleItem(self.getFirstVisibleItem());
+						selected = self.selectPrevVisibleItem(self.getFirstVisibleItem({ exceptDisabled: true }));
 
 					} else if ( e.keyCode == 38 ) {
 						// up
@@ -844,6 +844,9 @@
 					".m-select-d-box__list-item:active, .m-select-d-box__list-item_selected:active": {
 						"background-color": "#b80000", color: "white"
 					},
+					".m-select-d-box__list-item_disabled": {
+						"color": "#999999", "pointer-events": "none"
+					},
 					".m-select-d-box__list-item_hidden": {
 						display:"none"
 					},
@@ -1181,6 +1184,9 @@
 						list = self.get("list", null, !1),
 						selectedIds = self.getSelectedKeys().concat(msdbid);
 
+					if (list[msdbid].disabled)
+						return;
+
 					if (  self.get("multiple", null, !1)  ) {
 						list[msdbid].selected
 							? self._deselectByID(msdbid)
@@ -1226,7 +1232,7 @@
 						&& this.fx.hop(list[c], "value")
 						&& this.fx.hop(list[c], "label")
 					) {
-						if (  typeof list[c].selected == "undefined"  ) {
+						if (  typeof list[c].selected == "undefined" || list[c].disabled ) {
 							list[c].selected = false;
 
 						} else {
@@ -1259,6 +1265,9 @@
 					listItem.elem.className = "m-select-d-box__list-item";
 					listItem.elem.setAttribute('data-msdbid', c + '');
 					listItem.$elem = $(listItem.elem);
+
+					if (listItem.disabled)
+						listItem.$elem.addClass("m-select-d-box__list-item_disabled");
 
 					// addEventListener || attachEvent
 					$(listItem.elem).bind("click", this._onItemClick, null);
@@ -1617,11 +1626,22 @@
 			"applySelectedToList": function(list) {
 				!list && (list = this.get("list", null, !1));
 
-				Object.keys(list).forEach(function(c) {
-					if (!list[c]) return;
+				var _classNameSelected = "m-select-d-box__list-item_selected";
+				var _classNameDisabled = "m-select-d-box__list-item_disabled";
 
-					$.fn[list[c].selected ? "addClass" : "removeClass"]
-						.call([list[c].elem], "m-select-d-box__list-item_selected");
+				Object.keys(list).forEach(function(c) {
+					var item = list[c];
+
+					if (!item)
+						return;
+
+					item.selected
+						? item.$elem.addClass(_classNameSelected)
+						: item.$elem.removeClass(_classNameSelected);
+
+					item.disabled
+						? item.$elem.addClass(_classNameDisabled)
+						: item.$elem.removeClass(_classNameDisabled);
 				});
 
 				return this;
@@ -1733,7 +1753,12 @@
 					selectedCache = this.get("selectedCache", null, !1);
 
 				for (c = 0; c < value.length; c++) {
-					if (!this.fx.hop(valuesCache, value[c])) continue;
+					if (!this.fx.hop(valuesCache, value[c]))
+						continue;
+
+					if (valuesCache[value[c]].disabled)
+						continue;
+
 					valuesCache[value[c]].selected = true;
 					selectedCache[valuesCache[value[c]].id] = valuesCache[value[c]];
 				}
@@ -1754,7 +1779,12 @@
 					selectedCache = this.get("selectedCache", null, !1);
 
 				for (c = 0; c < label.length; c++) {
-					if (!this.fx.hop(labelsCache, label[c])) continue;
+					if (!this.fx.hop(labelsCache, label[c]))
+						continue;
+
+					if (labelsCache[label[c]].disabled)
+						continue;
+
 					labelsCache[label[c]].selected = true;
 					selectedCache[labelsCache[label[c]].id] = labelsCache[label[c]];
 				}
@@ -1871,6 +1901,34 @@
 					obj[ids[c]] = list[ids[c]];
 
 				return obj;
+			},
+
+
+			/**
+			 * Disable specified list option
+			 * @param {Object} item - list option
+			 * @return {MSelectDBox}
+			 * */
+			"disableItem": function(item) {
+				item.disabled = true;
+
+				item.$elem.addClass('m-select-d-box__list-item_disabled');
+
+				return this;
+			},
+
+
+			/**
+			 * enable specified list option
+			 * @param {Object} item - list option
+			 * @return {MSelectDBox}
+			 * */
+			"enableItem": function(item) {
+				item.disabled = false;
+
+				item.$elem.removeClass('m-select-d-box__list-item_disabled');
+
+				return this;
 			},
 
 
@@ -2023,13 +2081,18 @@
 			/**
 			 * Get next visible option in list
 			 * @param {Object} item - current (relative) list option
+			 * @param {Object=} opt
+			 * @param {Boolean=false} opt.exceptDisabled
 			 * @return {Object | undefined}
 			 * */
-			"getNextVisibleItem": function(item) {
-				if (!item || !item.next) return;
+			"getNextVisibleItem": function(item, opt) {
+				opt = opt || {};
 
-				if (!this.isVisibleItem(item.next))
-					return this.getNextVisibleItem(item.next);
+				if (!item || !item.next)
+					return;
+
+				if (!this.isVisibleItem(item.next) || (opt.exceptDisabled && item.next.disabled))
+					return this.getNextVisibleItem(item.next, opt);
 
 				return item.next;
 			},
@@ -2038,13 +2101,18 @@
 			/**
 			 * Get previous visible option in list
 			 * @param {Object} item - current (relative) list option
+			 * @param {Object=} opt
+			 * @param {Boolean=false} opt.exceptDisabled
 			 * @return {Object | undefined}
 			 * */
-			"getPrevVisibleItem": function(item) {
-				if (!item || !item.prev) return;
+			"getPrevVisibleItem": function(item, opt) {
+				opt = opt || {};
 
-				if (!this.isVisibleItem(item.prev))
-					return this.getPrevVisibleItem(item.prev);
+				if (!item || !item.prev)
+					return;
+
+				if (!this.isVisibleItem(item.prev) || (opt.exceptDisabled && item.prev.disabled))
+					return this.getPrevVisibleItem(item.prev, opt);
 
 				return item.prev;
 			},
@@ -2060,7 +2128,7 @@
 
 				var selected = this.getSelectedItems();
 
-				item = this.getNextVisibleItem(item);
+				item = this.getNextVisibleItem(item, { exceptDisabled: true });
 
 				if (!item) item = arguments[0];
 
@@ -2082,7 +2150,7 @@
 
 				var selected = this.getSelectedItems();
 
-				item = this.getPrevVisibleItem(item);
+				item = this.getPrevVisibleItem(item, { exceptDisabled: true });
 
 				if (!item) item = arguments[0];
 
@@ -2098,10 +2166,22 @@
 			 * Get last visible option in list
 			 * @return {Object}
 			 * */
-			"getLastVisibleItem": function() {
+			"getLastVisibleItem": function(opt) {
+				opt = opt || {};
+
 				var item = this.get("lastItem", null, !1);
 
-				return (this.isVisibleItem(item) && item) || this.getPrevVisibleItem(item);
+				if (item && this.isVisibleItem(item)) {
+					if (opt.exceptDisabled) {
+						if (!item.disabled) {
+							return item;
+						}
+					} else {
+						return item;
+					}
+				}
+
+				return this.getPrevVisibleItem(item, opt);
 			},
 
 
@@ -2109,10 +2189,15 @@
 			 * Get first visible option in list
 			 * @return {Object}
 			 * */
-			"getFirstVisibleItem": function() {
+			"getFirstVisibleItem": function(opt) {
+				opt = opt || {};
+
 				var item = this.get("firstItem", null, !1);
 
-				return (this.isVisibleItem(item) && item) || this.getNextVisibleItem(item);
+				if (item && (opt.exceptDisabled && !item.disabled) && this.isVisibleItem(item))
+					return item;
+
+				return this.getNextVisibleItem(item, opt);
 			},
 
 
@@ -2131,7 +2216,11 @@
 				reset && this._deselectAll();
 
 				for (c=0; c<ids.length; c++) {
-					if (  !list.hasOwnProperty(ids[c])  ) continue;
+					if (  !list.hasOwnProperty(ids[c])  )
+						continue;
+
+					if (list[ids[c]].disabled)
+						continue;
 
 					list[ids[c]].selected = true;
 					cache[ids[c]] = list[ids[c]];
@@ -2151,7 +2240,11 @@
 					cache = this.get("selectedCache", null, !1);
 
 				for (c = 0; c < ids.length; c++) {
-					if (!list.hasOwnProperty(ids[c])) continue;
+					if (!list.hasOwnProperty(ids[c]))
+						continue;
+
+					if (list[ids[c]].disabled)
+						continue;
 
 					list[ids[c]].selected = false;
 					delete cache[ids[c]];
@@ -2298,6 +2391,10 @@
 
 				for (c = 0; c < keys.length; c++) {
 					k = keys[c];
+
+					if (list[k].disabled)
+						continue;
+
 					list[k].selected = true;
 					selectedCache[k] = list[k];
 				}
@@ -2341,6 +2438,9 @@
 						delete selectedCache[key];
 						continue;
 					}
+
+					if (selectedCache[key].disabled)
+						continue;
 
 					selectedCache[key] = valuesCache[selectedCache[key].value];
 					selectedCache[key].selected = true;
